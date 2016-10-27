@@ -1,0 +1,40 @@
+{
+  "name": "mc-server",
+  "version": "0.0.0",
+  "description": "",
+  "main": "src/server.js",
+  "scripts": {
+    "develop": "nodemon .",
+    "lint": "eslint src/",
+    "test": "mocha 'test/**/*.js'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MobilityChoices/mc-server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MobilityChoices/mc-server/issues"
+  },
+  "homepage": "https://github.com/MobilityChoices/mc-server#readme",
+  "dependencies": {
+    "axios": "0.15.2",
+    "hapi": "15.2.0",
+    "qs": "6.3.0"
+  },
+  "devDependencies": {
+    "@types/axios": "0.9.33",
+    "@types/chai": "3.4.34",
+    "@types/hapi": "13.0.36",
+    "@types/mocha": "2.2.32",
+    "@types/qs": "6.2.30",
+    "@types/sinon": "1.16.31",
+    "chai": "3.5.0",
+    "eslint": "3.8.1",
+    "mocha": "3.1.2",
+    "nodemon": "1.11.0",
+    "sinon": "1.17.6"
+  }
+}

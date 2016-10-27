@@ -1,0 +1,32 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 6
+  },
+  "rules": {
+    "comma-spacing": ["error", { "before": false, "after": true }],
+    "curly": "error",
+    "eol-last": "error",
+    "eqeqeq": "error",
+    "max-len": ["warn", 80, 2, { "ignoreTemplateLiterals": true }],
+    "no-alert": "error",
+    "no-cond-assign": "error",
+    "no-console": "error",
+    "no-constant-condition": "error",
+    "no-debugger": "error",
+    "no-dupe-args": "error",
+    "no-dupe-keys": "error",
+    "no-duplicate-case": "error",
+    "no-empty": "error",
+    "no-extra-boolean-cast": "error",
+    "no-extra-semi": "error",
+    "no-multi-spaces": "error",
+    "no-trailing-spaces": "error",
+    "no-var": "error",
+    "prefer-const": "error",
+    "prefer-rest-params": "error",
+    "prefer-spread": "error",
+    "prefer-template": "error",
+    "semi": ["error", "never"],
+    "use-isnan": "error"
+  }
+}
