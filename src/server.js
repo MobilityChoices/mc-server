@@ -1,14 +1,15 @@
 const Hapi = require('hapi')
+const env = require('./env')
 
 const server = new Hapi.Server()
-server.connection({ port: 3000 })
+server.connection({ port: env.PORT })
 
 /**
  * Create a new track.
  */
 server.route({
   method: 'POST',
-  path: '/',
+  path: '/tracks',
   handler: (request, reply) => {
     console.log(request.payload) // eslint-disable-line no-console
     reply({ status: 'ok' })
