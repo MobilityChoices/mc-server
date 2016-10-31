@@ -5,13 +5,15 @@ const DEFAULT_OPTIONS = {
   stripUnknown: true,
 }
 
-const validate = (value, schema, options = DEFAULT_OPTIONS) => new Promise((resolve, reject) => {
-  Joi.validate(value, schema, options, (err, validatedValue) => {
-    if (err) {
-      return reject(err)
-    }
-    return resolve(validatedValue)
+const validate = (value, schema, options = DEFAULT_OPTIONS) => {
+  return new Promise((resolve, reject) => {
+    Joi.validate(value, schema, options, (err, validatedValue) => {
+      if (err) {
+        return reject(err)
+      }
+      return resolve(validatedValue)
+    })
   })
-})
+}
 
 module.exports = validate
