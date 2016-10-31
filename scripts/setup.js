@@ -37,7 +37,7 @@ const tracksIndex = {
     default: {
       properties: {
         created: { type: 'date', format: 'strict_date_optional_time||epoch_millis' },
-        owner: { type: 'string' },
+        owner: { type: 'string', index : 'not_analyzed' },
         locations: {
           type: 'nested',
           dynamic: 'strict',
@@ -64,10 +64,10 @@ const usersIndex = {
       _all: { enabled: false },
       properties: {
         activated: { type: 'boolean' },
-        activationCode: { type: 'string' },
+        activationCode: { type: 'string', index : 'not_analyzed' },
         created: { type: 'date', format: 'strict_date_optional_time||epoch_millis' },
-        email: { type: 'string' },
-        password: { type: 'string' },
+        email: { type: 'string', index : 'not_analyzed' },
+        password: { type: 'string', index : 'not_analyzed' },
       }
     }
   }

@@ -1,6 +1,6 @@
 const { assert } = require('chai')
 const sinon = require('sinon')
-const userMock = require('../../../mocks/track')
+const userMock = require('../../../mocks/user')
 const ElasticClient = require('../../../../src/services/storage/client')
 const userRepository = require('../../../../src/services/storage/repositories/user') // eslint-disable-line max-len
 
@@ -30,6 +30,26 @@ describe('user repository', () => {
         expectedDataArgument,
         expectedMethodArgument
       ))
+    })
+  })
+
+  describe('findByEmail', () => {
+    it('calls Elastic client with proper path, data and method', (done) => {
+      const email = userMock.email
+      const expectedPathArgument = '/users/default/_search'
+      const expectedDataArgument = { query: { term: { email: email } } }
+      const expectedMethodArgument = 'POST'
+
+      ElasticClient.request.returns(new Promise((resolve, reject) => resolve([ userMock ])))
+
+      userRepository.findByEmail(email).then(user => {
+        assert.isTrue(ElasticClient.request.calledWithMatch(
+          expectedPathArgument,
+          expectedDataArgument,
+          expectedMethodArgument
+        ))
+        done()
+      })
     })
   })
 
