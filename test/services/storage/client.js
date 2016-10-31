@@ -9,9 +9,11 @@ const responseData = {
 }
 
 describe('ElasticClient', () => {
+  const exampleData = { a: 'abc', b: '2' }
+
   beforeEach(() => {
     sinon.stub(axios, 'request')
-    axios.request.returns(new Promise((resolve, reject) => ({ data: responseData })))
+    axios.request.returns(new Promise((resolve, reject) => resolve({ data: responseData })))
   })
 
   afterEach(() => {
@@ -23,67 +25,107 @@ describe('ElasticClient', () => {
       assert.instanceOf(ElasticClient.request(), Promise)
     })
 
-    // it('resolves to the "data" property of the response', (done) => {
-    //   ElasticClient.request().then(d => {
-    //     assert.deepEqual(d, responseData)
-    //     done()
-    //   }).catch(err => {
-    //     done()
-    //   })
-    // })
-
-    context('GET', () => {
-      it('sends a GET request', () => {
-        ElasticClient.request('/path', {}, 'GET')
+    it('defaults to GET', (done) => {
+      ElasticClient.request('/path').then(response => {
         assert.isTrue(axios.request.calledWithMatch({
           method: 'GET',
         }))
+        done()
+      })
+    })
+
+    it('respects the method argument', (done) => {
+      ElasticClient.request('/path', exampleData, 'POST').then(response => {
+        assert.isTrue(axios.request.calledWithMatch({
+          method: 'POST',
+        }))
+        done()
+      })
+    })
+
+    context('successful response', () => {
+      it('resolves to the "data" property of the raw response', (done) => {
+        ElasticClient.request('/path', exampleData, 'POST').then(response => {
+          assert.deepEqual(response, responseData)
+          done()
+        })
+      })
+    })
+
+    context('GET', () => {
+      it('sends a GET request', (done) => {
+        ElasticClient.request('/path', exampleData, 'GET').then(response => {
+          assert.isTrue(axios.request.calledWithMatch({
+            method: 'GET',
+          }))
+          done()
+        })
       })
 
       context('data is passed', () => {
-        it('data is passed as query parameters', () => {
-          const data = { prop: 'value' }
-          ElasticClient.request('/path', data, 'GET')
-          const url = axios.request.getCall(0).args[0].url
-          const passedQueryParams = url.substring(url.indexOf('?') + 1)
-          assert.deepEqual(qs.parse(passedQueryParams), data)
+        it('data is passed as query parameters', (done) => {
+          ElasticClient.request('/path', exampleData, 'GET').then(response => {
+            const url = axios.request.getCall(0).args[0].url
+            const passedQueryParams = url.substring(url.indexOf('?') + 1)
+            assert.deepEqual(qs.parse(passedQueryParams), exampleData)
+            done()
+          })
         })
       })
     })
 
     context('HEAD', () => {
-      it('sends a HEAD request', () => {
-        ElasticClient.request('/path', {}, 'HEAD')
-        assert.isTrue(axios.request.calledWithMatch({
-          method: 'HEAD',
-        }))
+      it('sends a HEAD request', (done) => {
+        ElasticClient.request('/path', exampleData, 'HEAD').then(response => {
+          assert.isTrue(axios.request.calledWithMatch({
+            method: 'HEAD',
+          }))
+          done()
+        })
       })
     })
 
     context('POST', () => {
-      it('sends a POST request', () => {
-        ElasticClient.request('/path', {}, 'POST')
-        assert.isTrue(axios.request.calledWithMatch({
-          method: 'POST',
-        }))
+      it('sends a POST request', (done) => {
+        ElasticClient.request('/path', exampleData, 'POST').then(response => {
+          assert.isTrue(axios.request.calledWithMatch({
+            method: 'POST',
+          }))
+          done()
+        })
+      })
+
+      context('send data', () => {
+        it('sends the data as payload', (done) => {
+          ElasticClient.request('/path', exampleData, 'POST').then(response => {
+            assert.isTrue(axios.request.calledWithMatch({
+              data: exampleData,
+            }))
+            done()
+          })
+        })
       })
     })
 
     context('PUT', () => {
-      it('sends a PUT request', () => {
-        ElasticClient.request('/path', {}, 'PUT')
-        assert.isTrue(axios.request.calledWithMatch({
-          method: 'PUT',
-        }))
+      it('sends a PUT request', (done) => {
+        ElasticClient.request('/path', exampleData, 'PUT').then(response => {
+          assert.isTrue(axios.request.calledWithMatch({
+            method: 'PUT',
+          }))
+          done()
+        })
       })
     })
 
     context('DELETE', () => {
-      it('sends a DELETE request', () => {
-        ElasticClient.request('/path', {}, 'DELETE')
-        assert.isTrue(axios.request.calledWithMatch({
-          method: 'DELETE',
-        }))
+      it('sends a DELETE request', (done) => {
+        ElasticClient.request('/path', exampleData, 'DELETE').then(response => {
+          assert.isTrue(axios.request.calledWithMatch({
+            method: 'DELETE',
+          }))
+          done()
+        })
       })
     })
   })

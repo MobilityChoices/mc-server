@@ -22,9 +22,7 @@ const ElasticClient = {
       case 'POST':
       case 'PUT':
       case 'DELETE':
-        if (data !== {}) {
-          payload = data
-        }
+        payload = data
         break
     }
 
