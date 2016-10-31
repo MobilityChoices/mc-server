@@ -5,7 +5,8 @@
 
 ## Scripts
 
-- `npm run cover`: runs all tests and collects code coverage information
+- `npm run cover`: runs all tests and collects code coverage information; the
+  results can be viewed by opening `coverage/lcov-report/index.html`
 
 - `npm run develop`: restarts the server on every change
 
@@ -13,25 +14,9 @@
 
 - `npm run lint`: checks the code style
 
+- `npm run es:start`: starts the elasticsearch data store
 
-## Deployment
+- `npm run es:setup`: setups the mappings of the data store; this removes all
+  data from the data store!
 
-### Setup Data Store
-
-1. Start `elasticsearch`:
-
-```
-./elasticsearch/bin/elasticsearch
-```
-
-2. Setup the mappings (**WARNING**:this removes all data from the data store!):
-
-```
-node scripts/setup.js
-```
-
-3. Start the server:
-
-```
-node .
-```
+- `npm run start`: starts the server

@@ -6,10 +6,11 @@
   "scripts": {
     "cover": "istanbul cover _mocha --include-all-sources -x 'src/main.js' -x 'scripts/*.js' -- 'test/**/*.js'",
     "develop": "nodemon .",
-    "lab": "lab -t 100 --coverage-path 'src'",
-    "test-cov-html": "lab -r html --coverage-path 'src' -o coverage.html -a chai -P 'lab' -L",
     "lint": "eslint src/",
-    "test": "mocha 'test/**/*.js'"
+    "test": "mocha 'test/**/*.js'",
+    "es:start": "elasticsearch/bin/elasticsearch",
+    "es:setup": "node scripts/setup.js",
+    "start": "node ."
   },
   "engines": {
     "node": "6.9.0"
@@ -44,7 +45,6 @@
     "chai": "3.5.0",
     "eslint": "3.8.1",
     "istanbul": "0.4.5",
-    "lab": "11.1.0",
     "mocha": "3.1.2",
     "nodemon": "1.11.0",
     "sinon": "1.17.6"
