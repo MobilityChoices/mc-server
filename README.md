@@ -12,3 +12,26 @@
 - `npm run test`: runs all tests
 
 - `npm run lint`: checks the code style
+
+
+## Deployment
+
+### Setup Data Store
+
+1. Start `elasticsearch`:
+
+```
+./elasticsearch/bin/elasticsearch
+```
+
+2. Setup the mappings (**WARNING**:this removes all data from the data store!):
+
+```
+node scripts/setup.js
+```
+
+3. Start the server:
+
+```
+node .
+```
