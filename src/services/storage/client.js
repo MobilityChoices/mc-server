@@ -28,7 +28,7 @@ const ElasticClient = {
         break
     }
 
-    return axios({
+    return axios.request({
       method: method,
       url: elasticUrl(requestPath),
       data: payload,

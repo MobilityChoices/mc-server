@@ -31,8 +31,9 @@ describe('env', () => {
     })
 
     it('is a url', () => {
-      // TODO: write test
-      console.log('TODO') // eslint-disable-line no-console
+      /** @type {RegExp} */
+      const urlRegex = /^https?:\/\/.+$/
+      assert.isTrue(urlRegex.test(env.ELASTIC_URL))
     })
   })
 
