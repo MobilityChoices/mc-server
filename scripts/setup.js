@@ -63,10 +63,11 @@ const usersIndex = {
     default: {
       _all: { enabled: false },
       properties: {
+        activated: { type: 'boolean' },
+        activationCode: { type: 'string' },
         created: { type: 'date', format: 'strict_date_optional_time||epoch_millis' },
         email: { type: 'string' },
         password: { type: 'string' },
-        verified: { type: 'boolean' }
       }
     }
   }
