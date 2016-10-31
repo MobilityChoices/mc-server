@@ -13,6 +13,7 @@ const ElasticClient = {
 
     switch (method) {
       case 'GET':
+      case 'HEAD':
         const requestParams = qs.stringify(data)
         if (requestParams.length > 0) {
           requestPath += `?${requestParams}`
@@ -34,7 +35,5 @@ const ElasticClient = {
     }).then(response => response.data)
   }
 }
-
-ElasticClient.request()
 
 module.exports = ElasticClient

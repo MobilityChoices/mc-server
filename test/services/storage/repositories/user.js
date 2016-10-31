@@ -1,7 +1,8 @@
 const { assert } = require('chai')
 const sinon = require('sinon')
-const ElasticClient = require('../../../../src/services/elastic/client')
-const userRepository = require('../../../../src/services/storage/repositories/user')
+const userMock = require('../../../mocks/track')
+const ElasticClient = require('../../../../src/services/storage/client')
+const userRepository = require('../../../../src/services/storage/repositories/user') // eslint-disable-line max-len
 
 describe('user repository', () => {
 
@@ -14,12 +15,13 @@ describe('user repository', () => {
   })
 
   describe('find', () => {
-    const userId = 'qe31ad'
-
     it('calls Elastic client with proper path, data and method', () => {
+      const userId = userMock.id
       const expectedPathArgument = `/users/default/${userId}`
       const expectedDataArgument = {}
       const expectedMethodArgument = 'GET'
+
+      ElasticClient.request.returns(new Promise((resolve, reject) => resolve(userMock)))
 
       userRepository.find(userId)
 
@@ -37,6 +39,8 @@ describe('user repository', () => {
       const expectedDataArgument = {}
       const expectedMethodArgument = 'GET'
 
+      ElasticClient.request.returns(new Promise((resolve, reject) => resolve([userMock])))
+
       userRepository.all()
 
       assert.isTrue(ElasticClient.request.calledWithMatch(
@@ -49,16 +53,13 @@ describe('user repository', () => {
 
   describe('create', () => {
     it('calls Elastic client with proper path, data and method', () => {
-      const user = {
-        email: 'max.mustermann@example.com',
-        password: '$2a$10$UdA7ROqZWeVMz8L4MCBLiOSQTJAj6jWUpShctJ9.U.iy1ak/15PYu'
-      }
-
       const expectedPathArgument = `/users/default/`
-      const expectedDataArgument = user
+      const expectedDataArgument = userMock
       const expectedMethodArgument = 'POST'
 
-      userRepository.create(user)
+      ElasticClient.request.returns(new Promise((resolve, reject) => resolve({ status: 'ok' })))
+
+      userRepository.create(userMock)
 
       assert.isTrue(ElasticClient.request.calledWithMatch(
         expectedPathArgument,
@@ -72,16 +73,14 @@ describe('user repository', () => {
     const userId = 'qe31ad'
 
     it('calls Elastic client with proper path, data and method', () => {
-      const user = {
-        email: 'max.mustermann@example.com',
-        password: '$2a$10$UdA7ROqZWeVMz8L4MCBLiOSQTJAj6jWUpShctJ9.U.iy1ak/15PYu'
-      }
-
+      const userId = userMock.id
       const expectedPathArgument = `/users/default/${userId}`
-      const expectedDataArgument = user
+      const expectedDataArgument = userMock
       const expectedMethodArgument = 'PUT'
 
-      userRepository.update(userId, user)
+      ElasticClient.request.returns(new Promise((resolve, reject) => resolve({ status: 'ok' })))
+
+      userRepository.update(userId, userMock)
 
       assert.isTrue(ElasticClient.request.calledWithMatch(
         expectedPathArgument,
@@ -95,9 +94,12 @@ describe('user repository', () => {
     const userId = 'qe31ad'
 
     it('calls Elastic client with proper path, data and method', () => {
+      const userId = userMock.id
       const expectedPathArgument = `/users/default/${userId}`
       const expectedDataArgument = {}
       const expectedMethodArgument = 'DELETE'
+
+      ElasticClient.request.returns(new Promise((resolve, reject) => resolve({ status: 'ok' })))
 
       userRepository.delete(userId)
 

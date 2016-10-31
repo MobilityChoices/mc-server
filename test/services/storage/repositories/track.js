@@ -1,7 +1,8 @@
 const { assert } = require('chai')
 const sinon = require('sinon')
-const ElasticClient = require('../../../../src/services/elastic/client')
-const trackRepository = require('../../../../src/services/storage/repositories/track')
+const trackMock = require('../../../mocks/track')
+const ElasticClient = require('../../../../src/services/storage/client')
+const trackRepository = require('../../../../src/services/storage/repositories/track') // eslint-disable-line max-len
 
 describe('track repository', () => {
 
@@ -14,12 +15,13 @@ describe('track repository', () => {
   })
 
   describe('find', () => {
-    const trackId = 'qe31ad'
-
     it('calls Elastic client with proper path, data and method', () => {
+      const trackId = trackMock.id
       const expectedPathArgument = `/tracks/default/${trackId}`
       const expectedDataArgument = {}
       const expectedMethodArgument = 'GET'
+
+      ElasticClient.request.returns(new Promise((resolve, reject) => resolve(trackMock)))
 
       trackRepository.find(trackId)
 
@@ -37,6 +39,8 @@ describe('track repository', () => {
       const expectedDataArgument = {}
       const expectedMethodArgument = 'GET'
 
+      ElasticClient.request.returns(new Promise((resolve, reject) => resolve([trackMock])))
+
       trackRepository.all()
 
       assert.isTrue(ElasticClient.request.calledWithMatch(
@@ -49,18 +53,13 @@ describe('track repository', () => {
 
   describe('create', () => {
     it('calls Elastic client with proper path, data and method', () => {
-      const track = {
-        time: '2016-10-28 13:39:42',
-        locations: [
-          { lat: 23.45, lng: 47.91 }
-        ]
-      }
-
       const expectedPathArgument = `/tracks/default/`
-      const expectedDataArgument = track
+      const expectedDataArgument = trackMock
       const expectedMethodArgument = 'POST'
 
-      trackRepository.create(track)
+      ElasticClient.request.returns(new Promise((resolve, reject) => resolve({ status: 'ok' })))
+
+      trackRepository.create(trackMock)
 
       assert.isTrue(ElasticClient.request.calledWithMatch(
         expectedPathArgument,
@@ -71,21 +70,15 @@ describe('track repository', () => {
   })
 
   describe('update', () => {
-    const trackId = 'qe31ad'
-
     it('calls Elastic client with proper path, data and method', () => {
-      const track = {
-        time: '2016-10-28 13:39:42',
-        locations: [
-          { lat: 23.45, lng: 47.91 }
-        ]
-      }
-
+      const trackId = trackMock.id
       const expectedPathArgument = `/tracks/default/${trackId}`
-      const expectedDataArgument = track
+      const expectedDataArgument = trackMock
       const expectedMethodArgument = 'PUT'
 
-      trackRepository.update(trackId, track)
+      ElasticClient.request.returns(new Promise((resolve, reject) => resolve({ status: 'ok' })))
+
+      trackRepository.update(trackId, trackMock)
 
       assert.isTrue(ElasticClient.request.calledWithMatch(
         expectedPathArgument,
@@ -96,12 +89,13 @@ describe('track repository', () => {
   })
 
   describe('delete', () => {
-    const trackId = 'qe31ad'
-
     it('calls Elastic client with proper path, data and method', () => {
+      const trackId = trackMock.id
       const expectedPathArgument = `/tracks/default/${trackId}`
       const expectedDataArgument = {}
       const expectedMethodArgument = 'DELETE'
+
+      ElasticClient.request.returns(new Promise((resolve, reject) => resolve({ status: 'ok' })))
 
       trackRepository.delete(trackId)
 

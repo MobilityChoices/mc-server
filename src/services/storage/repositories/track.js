@@ -1,4 +1,4 @@
-const ElasticClient = require('../../elastic/client')
+const ElasticClient = require('../client')
 
 const trackRepository = {
   find: (id) => {
