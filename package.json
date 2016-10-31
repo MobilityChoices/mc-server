@@ -4,7 +4,7 @@
   "description": "Mobility Choices Backend",
   "main": "src/main.js",
   "scripts": {
-    "cover": "istanbul cover _mocha --include-all-sources -x 'src/main.js' -- 'test/**/*.js'",
+    "cover": "istanbul cover _mocha --include-all-sources -x 'src/main.js' -x 'scripts/*.js' -- 'test/**/*.js'",
     "develop": "nodemon .",
     "lab": "lab -t 100 --coverage-path 'src'",
     "test-cov-html": "lab -r html --coverage-path 'src' -o coverage.html -a chai -P 'lab' -L",
