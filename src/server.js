@@ -1,5 +1,6 @@
 const Hapi = require('hapi')
 const env = require('./env')
+const validateTrack = require('./helpers/validateTrack')
 
 const server = new Hapi.Server()
 server.connection({ port: env.PORT })
@@ -11,14 +12,12 @@ server.route({
   method: 'POST',
   path: '/tracks',
   handler: (request, reply) => {
-    console.log(request.payload) // eslint-disable-line no-console
-    reply({ status: 'ok' })
+    validateTrack(request.payload).then(track => {
+      reply(track).code(201)
+    }).catch(err => {
+      reply({ error: true }).code(400)
+    })
   }
 })
 
-server.start((err) => {
-  if (err) {
-    throw err
-  }
-  console.log(`Server listening on ${server.info.uri}`) // eslint-disable-line no-console
-})
+module.exports = server
