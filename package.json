@@ -28,6 +28,7 @@
   "homepage": "https://github.com/MobilityChoices/mc-server#readme",
   "dependencies": {
     "axios": "0.15.2",
+    "bcrypt": "0.8.7",
     "hapi": "15.2.0",
     "joi": "9.2.0",
     "jsonwebtoken": "7.1.9",
