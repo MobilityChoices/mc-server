@@ -4,6 +4,8 @@ const schemas = require('./helpers/schemas')
 const validate = require('./helpers/validate')
 const userRepository = require('./services/storage/repositories/user')
 
+const { ValidationError } = validate
+
 const server = new Hapi.Server()
 server.connection({ port: env.PORT })
 
@@ -28,16 +30,18 @@ server.route({
 server.route({
   method: 'POST',
   path: '/auth/register',
-  handler: (request, reply) => {
-    validate(request.payload, schemas.auth).then(user => {
-      userRepository.create(user).then(response => {
-        reply(user).code(201)
-      }).catch(err => {
+  handler: async (request, reply) => {
+    try {
+      const validatedUser = await validate(request.payload, schemas.auth)
+      const dbResponse = await userRepository.create(validatedUser)
+      reply(validatedUser).code(201)
+    } catch (e) {
+      if (e instanceof ValidationError) {
+        reply({ error: true }).code(400)
+      } else {
         reply({ error: true }).code(500)
-      })
-    }).catch(err => {
-      reply({ error: true }).code(400)
-    })
+      }
+    }
   }
 })
 

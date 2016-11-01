@@ -7,7 +7,7 @@
     "cover": "istanbul cover _mocha --include-all-sources -x 'src/main.js' -x 'scripts/*.js' -- 'test/**/*.js'",
     "develop": "nodemon .",
     "lint": "eslint src/",
-    "test": "mocha 'test/**/*.js'",
+    "test": "mocha --compilers js:babel-register 'test/**/*.js'",
     "es:start": "elasticsearch/bin/elasticsearch",
     "es:setup": "node scripts/setup.js",
     "start": "node ."
@@ -28,6 +28,9 @@
   "homepage": "https://github.com/MobilityChoices/mc-server#readme",
   "dependencies": {
     "axios": "0.15.2",
+    "babel-plugin-transform-async-to-generator": "6.16.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "6.18.0",
+    "babel-register": "6.18.0",
     "bcrypt": "0.8.7",
     "hapi": "15.2.0",
     "joi": "9.2.0",
@@ -45,6 +48,7 @@
     "@types/mocha": "2.2.32",
     "@types/qs": "6.2.30",
     "@types/sinon": "1.16.31",
+    "babel-eslint": "7.1.0",
     "chai": "3.5.0",
     "eslint": "3.8.1",
     "istanbul": "0.4.5",
