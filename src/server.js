@@ -41,4 +41,19 @@ server.route({
   }
 })
 
+/**
+ * Log in a registered user.
+ */
+server.route({
+  method: 'POST',
+  path: '/auth/login',
+  handler: (request, reply) => {
+    validate(request.payload, schemas.auth).then(user => {
+      reply({})
+    }).catch(err => {
+      reply({ error: true }).code(400)
+    })
+  }
+})
+
 module.exports = server

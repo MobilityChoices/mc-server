@@ -104,6 +104,29 @@ describe('server', () => {
     })
   })
 
+  describe('POST /auth/login', () => {
+    beforeEach(() => {
+      sinon.stub(userRepository, 'findByEmail')
+    })
+
+    afterEach(() => {
+      userRepository.findByEmail.restore()
+    })
+
+    context('valid data (email, password)', () => {
+      it('responds with status code 200', (done) => {
+        server.inject({
+          method: 'POST',
+          url: '/auth/login',
+          payload: user,
+        }, (response) => {
+          assert.equal(response.statusCode, 200)
+          done()
+        })
+      })
+    })
+  })
+
   describe('POST /tracks', () => {
     context('valid data', () => {
       it('responds with status code 201', (done) => {
