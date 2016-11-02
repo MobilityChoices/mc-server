@@ -5,9 +5,6 @@
 
 ## Scripts
 
-- `npm run cover`: runs all tests and collects code coverage information; the
-  results can be viewed by opening `coverage/lcov-report/index.html`
-
 - `npm run develop`: restarts the server on every change
 
 - `npm run test`: runs all tests

@@ -4,7 +4,6 @@
   "description": "Mobility Choices Backend",
   "main": "src/main.js",
   "scripts": {
-    "cover": "istanbul cover _mocha --include-all-sources -x 'src/main.js' -x 'scripts/*.js' -- 'test/**/*.js'",
     "develop": "nodemon .",
     "lint": "eslint src/",
     "test": "mocha --compilers js:babel-register 'test/**/*.js'",
@@ -32,6 +31,7 @@
     "babel-plugin-transform-es2015-modules-commonjs": "6.18.0",
     "babel-register": "6.18.0",
     "bcrypt": "0.8.7",
+    "boom": "4.2.0",
     "hapi": "15.2.0",
     "joi": "9.2.0",
     "jsonwebtoken": "7.1.9",
@@ -40,6 +40,7 @@
   },
   "devDependencies": {
     "@types/axios": "0.9.33",
+    "@types/boom": "0.0.32",
     "@types/chai": "3.4.34",
     "@types/hapi": "13.0.36",
     "@types/joi": "9.0.32",
@@ -51,7 +52,6 @@
     "babel-eslint": "7.1.0",
     "chai": "3.5.0",
     "eslint": "3.8.1",
-    "istanbul": "0.4.5",
     "mocha": "3.1.2",
     "nodemon": "1.11.0",
     "sinon": "1.17.6"
