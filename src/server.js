@@ -1,5 +1,6 @@
 import * as Boom from 'boom'
 import * as Hapi from 'hapi'
+import {} from './helpers/auth'
 const env = require('./env')
 const schemas = require('./helpers/schemas')
 import { compare, hash } from './helpers/crypto'
@@ -15,12 +16,13 @@ server.connection({ port: env.PORT })
 server.route({
   method: 'POST',
   path: '/tracks',
-  handler: (request, reply) => {
-    validate(request.payload, schemas.track).then(track => {
-      reply(track).code(201)
-    }).catch(err => {
-      reply({ error: true }).code(400)
-    })
+  handler: async (request, reply) => {
+    try {
+      const validatedTrack = await validate(request.payload, schemas.track)
+      reply(validatedTrack).code(201)
+    } catch (error) {
+      reply(error)
+    }
   }
 })
 
@@ -33,12 +35,10 @@ server.route({
   handler: async (request, reply) => {
     try {
       const validatedUser = await validate(request.payload, schemas.auth)
-      const passwordHash = await hash(validatedUser.password)
-      const hashedUser = Object.assign({}, validatedUser, {
-        password: passwordHash
-      })
-      const dbResponse = await userRepository.create(hashedUser)
-      reply(validatedUser).code(201)
+      const password = await hash(validatedUser.password)
+      const user = Object.assign({}, validatedUser, { password })
+      const dbResponse = await userRepository.create(user)
+      reply({}).code(201)
     } catch (error) {
       reply(error)
     }
