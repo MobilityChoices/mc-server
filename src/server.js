@@ -6,6 +6,7 @@ const schemas = require('./helpers/schemas')
 import { compare, hash } from './helpers/crypto'
 import validate from './helpers/validate'
 const userRepository = require('./services/storage/repositories/user')
+const trackRepository = require('./services/storage/repositories/track')
 
 const server = new Hapi.Server()
 server.connection({ port: env.PORT })
@@ -19,6 +20,7 @@ server.route({
   handler: async (request, reply) => {
     try {
       const validatedTrack = await validate(request.payload, schemas.track)
+      const dbResponse = await trackRepository.create(validatedTrack)
       reply(validatedTrack).code(201)
     } catch (error) {
       reply(error)

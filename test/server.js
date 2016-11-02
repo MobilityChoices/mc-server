@@ -1,10 +1,12 @@
-const { assert } = require('chai')
-const sinon = require('sinon')
+import { assert } from 'chai'
+import * as Boom from 'boom'
+import * as sinon from 'sinon'
 const server = require('../src/server')
 const track = require('./mocks/track-raw')
 const userAuth = require('./mocks/users/auth')
 const userDb = require('./mocks/users/db')
 const userRepository = require('../src/services/storage/repositories/user')
+const trackRepository = require('../src/services/storage/repositories/track')
 
 describe('server', () => {
 
@@ -107,7 +109,20 @@ describe('server', () => {
   })
 
   describe('POST /tracks', () => {
+
+    beforeEach(() => {
+      sinon.stub(trackRepository, 'create')
+    })
+
+    afterEach(() => {
+      trackRepository.create.restore()
+    })
+
     context('valid data', () => {
+      beforeEach(() => {
+        trackRepository.create.returns(Promise.resolve({}))
+      })
+
       it('responds with status code 201', (done) => {
         server.inject({
           method: 'POST',
