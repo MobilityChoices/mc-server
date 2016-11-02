@@ -1,6 +1,6 @@
 const { assert } = require('chai')
 const sinon = require('sinon')
-const userMock = require('../../../mocks/user')
+const userMock = require('../../../mocks/users/auth')
 const ElasticClient = require('../../../../src/services/storage/client')
 const userRepository = require('../../../../src/services/storage/repositories/user') // eslint-disable-line max-len
 

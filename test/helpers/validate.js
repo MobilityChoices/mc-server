@@ -1,11 +1,11 @@
-const { assert } = require('chai')
-const validate = require('../../src/helpers/validate')
+import { assert } from 'chai'
+import validate from '../../src/helpers/validate'
 const schemas = require('../../src/helpers/schemas')
 const track = require('../mocks/track-raw')
-const user = require('../mocks/user-raw')
+const user = require('../mocks/users/auth')
+const invalidUser = require('../mocks/users/invalid')
 
 const invalidTrack = Object.assign({}, track, { owner: undefined })
-const invalidUser = Object.assign({}, user, { email: undefined })
 
 describe('validate', () => {
   it('returns a Promise', () => {

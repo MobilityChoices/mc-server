@@ -4,7 +4,7 @@ import {} from './helpers/auth'
 const env = require('./env')
 const schemas = require('./helpers/schemas')
 import { compare, hash } from './helpers/crypto'
-const validate = require('./helpers/validate')
+import validate from './helpers/validate'
 const userRepository = require('./services/storage/repositories/user')
 
 const server = new Hapi.Server()

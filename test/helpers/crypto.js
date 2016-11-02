@@ -1,4 +1,4 @@
-const { assert } = require('chai')
+import { assert } from 'chai'
 import { compare, hash } from '../../src/helpers/crypto'
 
 const data = 'password'

@@ -2,8 +2,8 @@ const { assert } = require('chai')
 const sinon = require('sinon')
 const server = require('../src/server')
 const track = require('./mocks/track-raw')
-const userAuth = require('./mocks/users/max-mustermann.auth')
-const userDb = require('./mocks/users/max-mustermann.db')
+const userAuth = require('./mocks/users/auth')
+const userDb = require('./mocks/users/db')
 const userRepository = require('../src/services/storage/repositories/user')
 
 describe('server', () => {

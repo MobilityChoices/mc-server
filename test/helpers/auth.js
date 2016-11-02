@@ -1,5 +1,5 @@
-const { assert } = require('chai')
-const { createToken, verifyToken } = require('../../src/helpers/auth')
+import { assert } from 'chai'
+import { createToken, verifyToken } from '../../src/helpers/auth'
 
 describe('auth', () => {
   describe('createToken', () => {

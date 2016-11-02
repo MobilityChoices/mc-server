@@ -1,5 +1,5 @@
-const Boom = require('boom')
-const Joi = require('joi')
+import * as Boom from 'boom'
+import * as Joi from 'joi'
 
 const DEFAULT_OPTIONS = {
   allowUnknown: true,
@@ -17,4 +17,4 @@ const validate = (value, schema, options = DEFAULT_OPTIONS) => {
   })
 }
 
-module.exports = validate
+export default validate
