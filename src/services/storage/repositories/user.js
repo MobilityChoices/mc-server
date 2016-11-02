@@ -23,11 +23,8 @@ const userRepository = {
     }
     return ElasticClient.request('/users/default/_search', payload, 'POST')
       .then(response => {
-        const hits = _.get(response, 'hits.hits', [])
-        if (hits.length) {
-          return Object.assign({}, { _id: hits[0]._id, data: hits[0]._source })
-        }
-        return null
+        const firstHit = _.get(response, 'hits.hits[0]', {})
+        return Object.assign({}, { _id: firstHit._id, data: firstHit._source })
       })
   },
 

@@ -1,3 +1,4 @@
+const Boom = require('boom')
 const Joi = require('joi')
 
 const DEFAULT_OPTIONS = {
@@ -5,19 +6,15 @@ const DEFAULT_OPTIONS = {
   stripUnknown: true,
 }
 
-class ValidationError extends Error {}
-
 const validate = (value, schema, options = DEFAULT_OPTIONS) => {
   return new Promise((resolve, reject) => {
     Joi.validate(value, schema, options, (err, validatedValue) => {
       if (err) {
-        return reject(new ValidationError(err))
+        return reject(Boom.badRequest('invalid entity'))
       }
       return resolve(validatedValue)
     })
   })
 }
-
-validate.ValidationError = ValidationError
 
 module.exports = validate

@@ -1,10 +1,10 @@
-const Hapi = require('hapi')
+import * as Boom from 'boom'
+import * as Hapi from 'hapi'
 const env = require('./env')
 const schemas = require('./helpers/schemas')
+import { compare, hash } from './helpers/crypto'
 const validate = require('./helpers/validate')
 const userRepository = require('./services/storage/repositories/user')
-
-const { ValidationError } = validate
 
 const server = new Hapi.Server()
 server.connection({ port: env.PORT })
@@ -33,14 +33,14 @@ server.route({
   handler: async (request, reply) => {
     try {
       const validatedUser = await validate(request.payload, schemas.auth)
-      const dbResponse = await userRepository.create(validatedUser)
+      const passwordHash = await hash(validatedUser.password)
+      const hashedUser = Object.assign({}, validatedUser, {
+        password: passwordHash
+      })
+      const dbResponse = await userRepository.create(hashedUser)
       reply(validatedUser).code(201)
-    } catch (e) {
-      if (e instanceof ValidationError) {
-        reply({ error: true }).code(400)
-      } else {
-        reply({ error: true }).code(500)
-      }
+    } catch (error) {
+      reply(error)
     }
   }
 })
@@ -51,12 +51,20 @@ server.route({
 server.route({
   method: 'POST',
   path: '/auth/login',
-  handler: (request, reply) => {
-    validate(request.payload, schemas.auth).then(user => {
-      reply({})
-    }).catch(err => {
-      reply({ error: true }).code(400)
-    })
+  handler: async (request, reply) => {
+    try {
+      const validatedUser = await validate(request.payload, schemas.auth)
+      const user = await userRepository.findByEmail(validatedUser.email)
+      const passedPassword = validatedUser.password
+      const passwordHash = user.data.password
+      const passwordsMatch = await compare(passedPassword, passwordHash)
+      if (!passwordsMatch) {
+        throw Boom.badRequest()
+      }
+      reply({ loggedIn: true })
+    } catch (error) {
+      reply(error)
+    }
   }
 })
 

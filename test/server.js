@@ -2,7 +2,8 @@ const { assert } = require('chai')
 const sinon = require('sinon')
 const server = require('../src/server')
 const track = require('./mocks/track-raw')
-const user = require('./mocks/user-raw')
+const userAuth = require('./mocks/users/max-mustermann.auth')
+const userDb = require('./mocks/users/max-mustermann.db')
 const userRepository = require('../src/services/storage/repositories/user')
 
 describe('server', () => {
@@ -31,39 +32,16 @@ describe('server', () => {
 
     context('valid data (email, password)', () => {
       beforeEach(() => {
-        userRepository.create.returns(Promise.resolve(user))
-      })
-
-      it('creates a new user', (done) => {
-        server.inject({
-          method: 'POST',
-          url: '/auth/register',
-          payload: user,
-        }, (response) => {
-          assert.isTrue(userRepository.create.calledWithMatch(user))
-          done()
-        })
+        userRepository.create.returns(Promise.resolve(userAuth))
       })
 
       it('responds with 201', (done) => {
         server.inject({
           method: 'POST',
           url: '/auth/register',
-          payload: user,
+          payload: userAuth,
         }, (response) => {
           assert.equal(response.statusCode, 201)
-          done()
-        })
-      })
-
-      it('returns the newly created user', (done) => {
-        server.inject({
-          method: 'POST',
-          url: '/auth/register',
-          payload: user,
-        }, (response) => {
-          const responseObj = JSON.parse(response.payload)
-          assert.deepEqual(responseObj, user)
           done()
         })
       })
@@ -71,14 +49,14 @@ describe('server', () => {
 
     context('invalid data', () => {
       beforeEach(() => {
-        userRepository.create.returns(Promise.resolve(user))
+        userRepository.create.returns(Promise.resolve(userDb))
       })
 
       it('responds with 400', (done) => {
         server.inject({
           method: 'POST',
           url: '/auth/register',
-          payload: Object.assign({}, user, { email: undefined }),
+          payload: Object.assign({}, userAuth, { email: undefined }),
         }, (response) => {
           assert.equal(response.statusCode, 400)
           done()
@@ -95,7 +73,7 @@ describe('server', () => {
         server.inject({
           method: 'POST',
           url: '/auth/register',
-          payload: user,
+          payload: userAuth,
         }, (response) => {
           assert.equal(response.statusCode, 500)
           done()
@@ -115,10 +93,11 @@ describe('server', () => {
 
     context('valid data (email, password)', () => {
       it('responds with status code 200', (done) => {
+        userRepository.findByEmail.returns(Promise.resolve({ _id: '__ID__', data: userDb }))
         server.inject({
           method: 'POST',
           url: '/auth/login',
-          payload: user,
+          payload: userAuth,
         }, (response) => {
           assert.equal(response.statusCode, 200)
           done()
