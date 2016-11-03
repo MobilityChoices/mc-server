@@ -14,7 +14,6 @@ export const hash = (data) => new Promise((resolve, reject) => {
   })
 })
 
-
 /**
  * @param {string} data
  * @param {string} hash
