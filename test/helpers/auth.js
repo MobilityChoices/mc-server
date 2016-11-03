@@ -1,27 +1,34 @@
 import { assert } from 'chai'
 import { createToken, verifyToken } from '../../src/helpers/auth'
+import { encodedPayload, payload, token } from '../mocks/auth'
 
 describe('auth', () => {
   describe('createToken', () => {
-    it('returns a string', () => {
-      assert.isString(createToken({ uid: 'y82xa' }))
+    it('returns a Promise', () => {
+      assert.instanceOf(createToken(payload), Promise)
+    })
+
+    it('resolves the token (header.payload.signature)', (done) => {
+      createToken(payload).then(t => {
+        assert.equal(t.split('.').length, 3)
+        done()
+      })
     })
   })
 
   describe('verifyToken', () => {
+    it('returns a promise', () => {
+      assert.instanceOf(verifyToken(token), Promise)
+    })
+
     context('token is valid', () => {
-      let token = null
-
-      beforeEach(() => {
-        token = createToken({ uid: 'y82xa' })
-      })
-
-      afterEach(() => {
-        token = null
-      })
-
-      it('returns the token', () => {
-        assert.isObject(verifyToken(token))
+      it('resolves the token', (done) => {
+        verifyToken(token).then(p => {
+          Object.keys(payload).forEach(key => {
+            assert.equal(p[key], payload[key])
+          })
+          done()
+        })
       })
     })
 
