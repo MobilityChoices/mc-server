@@ -1,9 +1,13 @@
 import * as JWT from 'jsonwebtoken'
 import * as env from '../env'
 
+const signOptions = {
+  noTimestamp: true,
+}
+
 export const createToken = (payload) => {
   return new Promise((resolve, reject) => {
-    JWT.sign(payload, env.SECRET_KEY, {}, (err, token) => {
+    JWT.sign(payload, env.SECRET_KEY, signOptions, (err, token) => {
       if (err) {
         return reject(err)
       }

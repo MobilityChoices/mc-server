@@ -8,9 +8,9 @@ describe('auth', () => {
       assert.instanceOf(createToken(payload), Promise)
     })
 
-    it('resolves the token (header.payload.signature)', (done) => {
+    it('resolves the token', (done) => {
       createToken(payload).then(t => {
-        assert.equal(t.split('.').length, 3)
+        assert.equal(t, token)
         done()
       })
     })
@@ -24,16 +24,18 @@ describe('auth', () => {
     context('token is valid', () => {
       it('resolves the token', (done) => {
         verifyToken(token).then(p => {
-          Object.keys(payload).forEach(key => {
-            assert.equal(p[key], payload[key])
-          })
+          assert.deepEqual(p, payload)
           done()
         })
       })
     })
 
     context('token is invalid', () => {
-
+      it('rejects', (done) => {
+        verifyToken(token.replace('e', 'z')).catch(err => {
+          done()
+        })
+      })
     })
   })
 })
