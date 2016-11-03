@@ -1,5 +1,12 @@
-const Hapi = require('hapi')
+import * as Boom from 'boom'
+import * as Hapi from 'hapi'
+import { createToken, verifyToken } from './helpers/auth'
 const env = require('./env')
+const schemas = require('./helpers/schemas')
+import { compare, hash } from './helpers/crypto'
+import validate from './helpers/validate'
+const userRepository = require('./services/storage/repositories/user')
+const trackRepository = require('./services/storage/repositories/track')
 
 const server = new Hapi.Server()
 server.connection({ port: env.PORT })
@@ -10,15 +17,58 @@ server.connection({ port: env.PORT })
 server.route({
   method: 'POST',
   path: '/tracks',
-  handler: (request, reply) => {
-    console.log(request.payload) // eslint-disable-line no-console
-    reply({ status: 'ok' })
+  handler: async (request, reply) => {
+    try {
+      const verifiedToken = await verifyToken(request.headers['authorization'])
+      const validatedTrack = await validate(request.payload, schemas.track)
+      const dbResponse = await trackRepository.create(validatedTrack)
+      reply(validatedTrack).code(201)
+    } catch (error) {
+      reply(error)
+    }
   }
 })
 
-server.start((err) => {
-  if (err) {
-    throw err
+/**
+ * Register a new user.
+ */
+server.route({
+  method: 'POST',
+  path: '/auth/register',
+  handler: async (request, reply) => {
+    try {
+      const validatedUser = await validate(request.payload, schemas.auth)
+      const password = await hash(validatedUser.password)
+      const user = Object.assign({}, validatedUser, { password })
+      const dbResponse = await userRepository.create(user)
+      reply({}).code(201)
+    } catch (error) {
+      reply(error)
+    }
   }
-  console.log(`Server listening on ${server.info.uri}`) // eslint-disable-line no-console
 })
+
+/**
+ * Log in a registered user.
+ */
+server.route({
+  method: 'POST',
+  path: '/auth/login',
+  handler: async (request, reply) => {
+    try {
+      const validatedUser = await validate(request.payload, schemas.auth)
+      const user = await userRepository.findByEmail(validatedUser.email)
+      const passedPassword = validatedUser.password
+      const passwordHash = user.data.password
+      const passwordsMatch = await compare(passedPassword, passwordHash)
+      if (!passwordsMatch) {
+        throw Boom.badRequest()
+      }
+      reply(createToken)
+    } catch (error) {
+      reply(error)
+    }
+  }
+})
+
+module.exports = server

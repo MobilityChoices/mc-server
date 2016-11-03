@@ -1,4 +1,8 @@
 .DS_Store
 npm-debug.log
 
-node_modules
+node_modules/
+
+# elasticsearch
+elasticsearch/data
+elasticsearch/logs
