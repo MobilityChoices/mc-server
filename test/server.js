@@ -7,6 +7,7 @@ const userAuth = require('./mocks/users/auth')
 const userDb = require('./mocks/users/db')
 const userRepository = require('../src/services/storage/repositories/user')
 const trackRepository = require('../src/services/storage/repositories/track')
+import { token } from './mocks/auth'
 
 describe('server', () => {
 
@@ -127,6 +128,7 @@ describe('server', () => {
         server.inject({
           method: 'POST',
           url: '/tracks',
+          headers: { 'Authorization': token },
           payload: track,
         }, (response) => {
           assert.equal(response.statusCode, 201)
@@ -138,6 +140,7 @@ describe('server', () => {
         server.inject({
           method: 'POST',
           url: '/tracks',
+          headers: { 'Authorization': token },
           payload: track,
         }, (response) => {
           const responseObj = JSON.parse(response.payload)
@@ -152,6 +155,7 @@ describe('server', () => {
         server.inject({
           method: 'POST',
           url: '/tracks',
+          headers: { 'Authorization': token },
           payload: Object.assign({}, track, { owner: undefined }),
         }, (response) => {
           assert.equal(response.statusCode, 400)
@@ -163,6 +167,7 @@ describe('server', () => {
         server.inject({
           method: 'POST',
           url: '/tracks',
+          headers: { 'Authorization': token },
           payload: Object.assign({}, track, { owner: undefined }),
         }, (response) => {
           const responseObj = JSON.parse(response.payload)

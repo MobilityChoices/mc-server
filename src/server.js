@@ -1,6 +1,6 @@
 import * as Boom from 'boom'
 import * as Hapi from 'hapi'
-import {} from './helpers/auth'
+import { createToken, verifyToken } from './helpers/auth'
 const env = require('./env')
 const schemas = require('./helpers/schemas')
 import { compare, hash } from './helpers/crypto'
@@ -19,6 +19,7 @@ server.route({
   path: '/tracks',
   handler: async (request, reply) => {
     try {
+      const verifiedToken = await verifyToken(request.headers['authorization'])
       const validatedTrack = await validate(request.payload, schemas.track)
       const dbResponse = await trackRepository.create(validatedTrack)
       reply(validatedTrack).code(201)
@@ -63,7 +64,7 @@ server.route({
       if (!passwordsMatch) {
         throw Boom.badRequest()
       }
-      reply({ loggedIn: true })
+      reply(createToken)
     } catch (error) {
       reply(error)
     }
