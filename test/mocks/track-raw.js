@@ -6,5 +6,4 @@ module.exports = {
       time: '2016-10-30T22:45:44.794'
     }
   ],
-  owner: '48al4'
 }

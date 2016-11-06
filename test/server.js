@@ -8,6 +8,7 @@ const userDb = require('./mocks/users/db')
 const userRepository = require('../src/services/storage/repositories/user')
 const trackRepository = require('../src/services/storage/repositories/track')
 import { token } from './mocks/auth'
+import userFindResponse from './mocks/users/find'
 
 describe('server', () => {
 
@@ -69,7 +70,7 @@ describe('server', () => {
 
     context('valid data but storing fails', () => {
       beforeEach(() => {
-        userRepository.create.returns(Promise.reject(new Error()))
+        userRepository.create.returns(Promise.reject(new Error('test rejection')))
       })
 
       it('responds with 500', (done) => {
@@ -96,7 +97,7 @@ describe('server', () => {
 
     context('valid data (email, password)', () => {
       it('responds with status code 200', (done) => {
-        userRepository.findByEmail.returns(Promise.resolve({ _id: '__ID__', data: userDb }))
+        userRepository.findByEmail.returns(Promise.resolve(userFindResponse))
         server.inject({
           method: 'POST',
           url: '/auth/login',
@@ -113,15 +114,18 @@ describe('server', () => {
 
     beforeEach(() => {
       sinon.stub(trackRepository, 'create')
+      sinon.stub(userRepository, 'find')
     })
 
     afterEach(() => {
       trackRepository.create.restore()
+      userRepository.find.restore()
     })
 
     context('valid data', () => {
       beforeEach(() => {
         trackRepository.create.returns(Promise.resolve({}))
+        userRepository.find.returns(Promise.resolve(userFindResponse))
       })
 
       it('responds with status code 201', (done) => {
@@ -151,12 +155,16 @@ describe('server', () => {
     })
 
     context('invalid data', () => {
+      beforeEach(() => {
+        userRepository.find.returns(Promise.resolve(userFindResponse))
+      })
+
       it('responds with status code 400', (done) => {
         server.inject({
           method: 'POST',
           url: '/tracks',
           headers: { 'Authorization': token },
-          payload: Object.assign({}, track, { owner: undefined }),
+          payload: Object.assign({}, track, { locations: undefined }),
         }, (response) => {
           assert.equal(response.statusCode, 400)
           done()
@@ -168,7 +176,7 @@ describe('server', () => {
           method: 'POST',
           url: '/tracks',
           headers: { 'Authorization': token },
-          payload: Object.assign({}, track, { owner: undefined }),
+          payload: Object.assign({}, track, { locations: undefined }),
         }, (response) => {
           const responseObj = JSON.parse(response.payload)
           assert.isObject(responseObj)

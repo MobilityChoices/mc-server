@@ -5,7 +5,7 @@ const track = require('../mocks/track-raw')
 const user = require('../mocks/users/auth')
 const invalidUser = require('../mocks/users/invalid')
 
-const invalidTrack = Object.assign({}, track, { owner: undefined })
+const invalidTrack = Object.assign({}, track, { locations: undefined })
 
 describe('validate', () => {
   it('returns a Promise', () => {

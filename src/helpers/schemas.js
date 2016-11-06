@@ -2,7 +2,6 @@ import * as Joi from 'joi'
 
 const coordinate = Joi.number()
 const email = Joi.string().email()
-const id = Joi.string()
 const password = Joi.string()
 
 export const auth = Joi.object().keys({
@@ -18,7 +17,6 @@ export const location = Joi.object().keys({
 
 export const track = Joi.object().keys({
   locations: Joi.array().items(location).required(),
-  owner: id.required(),
 })
 
 export const user = Joi.object().keys({
