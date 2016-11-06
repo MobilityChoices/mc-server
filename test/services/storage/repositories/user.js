@@ -3,6 +3,7 @@ const sinon = require('sinon')
 const userMock = require('../../../mocks/users/auth')
 const ElasticClient = require('../../../../src/services/storage/client')
 const userRepository = require('../../../../src/services/storage/repositories/user') // eslint-disable-line max-len
+import userFindByEmailResponse from '../../../mocks/users/findByEmail'
 
 describe('user repository', () => {
 
@@ -40,7 +41,7 @@ describe('user repository', () => {
       const expectedDataArgument = { query: { term: { email: email } } }
       const expectedMethodArgument = 'POST'
 
-      ElasticClient.request.returns(new Promise((resolve, reject) => resolve([ userMock ])))
+      ElasticClient.request.returns(Promise.resolve(userFindByEmailResponse))
 
       userRepository.findByEmail(email).then(user => {
         assert.isTrue(ElasticClient.request.calledWithMatch(

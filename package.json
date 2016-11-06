@@ -6,7 +6,7 @@
   "scripts": {
     "develop": "nodemon .",
     "lint": "eslint src/",
-    "test": "mocha --compilers js:babel-register 'test/**/*.js'",
+    "test": "NODE_ENV=test mocha --compilers js:babel-register 'test/**/*.js'",
     "es:start": "elasticsearch/bin/elasticsearch",
     "es:setup": "node scripts/setup.js",
     "start": "node ."

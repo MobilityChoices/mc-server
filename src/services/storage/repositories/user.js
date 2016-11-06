@@ -1,5 +1,6 @@
 const ElasticClient = require('../client')
 const _ = require('lodash')
+import * as Boom from 'boom'
 
 const userRepository = {
   /**
@@ -23,8 +24,11 @@ const userRepository = {
     }
     return ElasticClient.request('/users/default/_search', payload, 'POST')
       .then(response => {
-        const firstHit = _.get(response, 'hits.hits[0]', {})
-        return Object.assign({}, { _id: firstHit._id, data: firstHit._source })
+        const firstHit = _.get(response, 'hits.hits[0]', null)
+        if (!firstHit) {
+          throw Boom.notFound('user not found')
+        }
+        return firstHit
       })
   },
 
