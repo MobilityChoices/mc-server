@@ -1,4 +1,4 @@
-const env = require('../../env')
+import env from '../../env'
 
 /**
  * Constructs a URL to be used by the Elastic client.
@@ -6,8 +6,7 @@ const env = require('../../env')
  * @param {string} requestPath
  * @returns {string} the full URL
  */
-const elasticUrl = (requestPath) => {
-  /** @type {string} */
+const elasticUrl = (requestPath: string) => {
   const prefix = env.ELASTIC_URL
 
   if (!prefix) {
@@ -22,4 +21,4 @@ const elasticUrl = (requestPath) => {
   return [sanitizedApiUrl, sanitizedRequestPath].join('/')
 }
 
-module.exports = elasticUrl
+export default elasticUrl

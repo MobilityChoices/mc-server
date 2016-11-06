@@ -1,20 +1,13 @@
-const ElasticClient = require('../client')
-const _ = require('lodash')
+import ElasticClient from '../client'
+import * as _ from 'lodash'
 import * as Boom from 'boom'
 
 const userRepository = {
-  /**
-   * @param {string} id
-   */
-  find: (id) => {
+  find: (id: string) => {
     return ElasticClient.request(`/users/default/${id}`, {}, 'GET')
   },
 
-  /**
-   * @param {string} email
-   * @returns {Promise<Object>}
-   */
-  findByEmail: (email) => {
+  findByEmail: (email: string) => {
     const payload = {
       query: {
         term: {
@@ -36,25 +29,15 @@ const userRepository = {
     return ElasticClient.request(`/users/default/`, {}, 'GET')
   },
 
-  /**
-   * @param {Object} user
-   */
-  create: (user) => {
+  create: (user: any) => {
     return ElasticClient.request(`/users/default/`, user, 'POST')
   },
 
-  /**
-   * @param {string} id
-   * @param {Object} user
-   */
-  update: (id, user) => {
+  update: (id: string, user: any) => {
     return ElasticClient.request(`/users/default/${id}`, user, 'PUT')
   },
 
-  /**
-   * @param {string} id
-   */
-  delete: (id) => {
+  delete: (id: string) => {
     return ElasticClient.request(`/users/default/${id}`, {}, 'DELETE')
   }
 }

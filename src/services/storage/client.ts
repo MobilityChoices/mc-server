@@ -1,6 +1,6 @@
-const axios = require('axios')
-const qs = require('qs')
-const elasticUrl = require('./elasticUrl')
+import * as axios from 'axios'
+import * as qs from 'qs'
+import elasticUrl from './elasticUrl'
 
 const ElasticClient = {
   /**
@@ -34,4 +34,4 @@ const ElasticClient = {
   }
 }
 
-module.exports = ElasticClient
+export default ElasticClient

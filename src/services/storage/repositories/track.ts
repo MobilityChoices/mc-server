@@ -1,7 +1,7 @@
-const ElasticClient = require('../client')
+import ElasticClient from '../client'
 
 const trackRepository = {
-  find: (id) => {
+  find: (id: string) => {
     return ElasticClient.request(`/tracks/default/${id}`, {}, 'GET')
   },
 
@@ -9,15 +9,15 @@ const trackRepository = {
     return ElasticClient.request(`/tracks/default/`, {}, 'GET')
   },
 
-  create: (track) => {
+  create: (track: any) => {
     return ElasticClient.request(`/tracks/default/`, track, 'POST')
   },
 
-  update: (id, track) => {
+  update: (id: string, track: any) => {
     return ElasticClient.request(`/tracks/default/${id}`, track, 'PUT')
   },
 
-  delete: (id) => {
+  delete: (id: string) => {
     return ElasticClient.request(`/tracks/default/${id}`, {}, 'DELETE')
   }
 }

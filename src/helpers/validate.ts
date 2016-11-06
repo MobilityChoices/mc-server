@@ -6,7 +6,7 @@ const DEFAULT_OPTIONS = {
   stripUnknown: true,
 }
 
-const validate = (value, schema, options = DEFAULT_OPTIONS) => {
+const validate = (value: Object, schema: Object, options = DEFAULT_OPTIONS) => {
   return new Promise((resolve, reject) => {
     Joi.validate(value, schema, options, (err, validatedValue) => {
       if (err) {

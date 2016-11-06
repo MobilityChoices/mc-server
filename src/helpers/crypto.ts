@@ -5,8 +5,8 @@ const HASHING_ROUNDS = 10
 /**
  * @param {string} data
  */
-export const hash = (data) => new Promise((resolve, reject) => {
-  bcrypt.hash(data, HASHING_ROUNDS, (err, hash) => {
+export const hash = (data: string) => new Promise((resolve, reject) => {
+  bcrypt.hash(data, HASHING_ROUNDS, (err: Error, hash: string) => {
     if (err) {
       return reject(err)
     }
@@ -18,7 +18,7 @@ export const hash = (data) => new Promise((resolve, reject) => {
  * @param {string} data
  * @param {string} hash
  */
-export const compare = (data, hash) => new Promise((resolve, reject) => {
+export const compare = (data: string, hash: string) => new Promise((resolve, reject) => {
   bcrypt.compare(data, hash, (err, result) => {
     if (err) {
       return reject(err)

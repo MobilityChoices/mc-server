@@ -1,6 +1,4 @@
-require('babel-register')
-
-const server = require('./server')
+import server from './server'
 
 server.start((err) => {
   if (err) {
