@@ -22,4 +22,4 @@ const trackRepository = {
   }
 }
 
-module.exports = trackRepository
+export default trackRepository

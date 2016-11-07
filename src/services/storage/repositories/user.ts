@@ -1,45 +1,29 @@
-import ElasticClient from '../client'
-import * as _ from 'lodash'
-import * as Boom from 'boom'
+import { User } from '../../../types'
+import repository, { Document } from '../repository'
 
 const userRepository = {
+  create: (user: any) => {
+    return repository.create('users', 'default', user)
+  },
+
   find: (id: string) => {
-    return ElasticClient.request(`/users/default/${id}`, {}, 'GET')
+    return repository.find<User>('users', 'default', id)
   },
 
   findByEmail: (email: string) => {
-    const payload = {
-      query: {
-        term: {
-          email: email
+    const query = { query: { term: { email: email } } }
+    return new Promise<Document<User>>((resolve, reject) => {
+      repository.query<User>('users', 'default', query).then(response => {
+        if (response.hits.hits.length > 0) {
+          resolve(response.hits.hits[0])
+        } else {
+          reject({})
         }
-      }
-    }
-    return ElasticClient.request('/users/default/_search', payload, 'POST')
-      .then(response => {
-        const firstHit = _.get(response, 'hits.hits[0]', null)
-        if (!firstHit) {
-          throw Boom.notFound('user not found')
-        }
-        return firstHit
+      }).catch(err => {
+        reject(err)
       })
+    })
   },
-
-  all: () => {
-    return ElasticClient.request(`/users/default/`, {}, 'GET')
-  },
-
-  create: (user: any) => {
-    return ElasticClient.request(`/users/default/`, user, 'POST')
-  },
-
-  update: (id: string, user: any) => {
-    return ElasticClient.request(`/users/default/${id}`, user, 'PUT')
-  },
-
-  delete: (id: string) => {
-    return ElasticClient.request(`/users/default/${id}`, {}, 'DELETE')
-  }
 }
 
-module.exports = userRepository
+export default userRepository
