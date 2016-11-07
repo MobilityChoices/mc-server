@@ -3,7 +3,7 @@
     "module": "commonjs",
     "noImplicitAny": true,
     "noImplicitUseStrict": true,
-    "outDir": "../dist",
+    "outDir": "dist",
     "strictNullChecks": true,
     "target": "es2015"
   }
