@@ -4,5 +4,5 @@ server.start((err) => {
   if (err) {
     throw err
   }
-  console.log(`Server listening on ${server.info.uri}`) // eslint-disable-line no-console
+  console.log(`Server listening on ${server.info.uri}`) // tslint:disable-line:no-console
 })

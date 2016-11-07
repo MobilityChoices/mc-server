@@ -11,6 +11,8 @@ const ElasticClient = {
   request: (requestPath = '', data = {}, method = 'GET') => {
     let payload = {}
 
+    console.log(`[Elastic] ${method}  ${requestPath}`) // tslint:disable-line:no-console
+
     switch (method) {
       case 'GET':
       case 'HEAD':

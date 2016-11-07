@@ -40,43 +40,46 @@ interface SearchResponse<T> {
 const repository = {
   create: <T>(index: string, type: string, value: T) => {
     return new Promise<string>((resolve, reject) => {
-      ElasticClient.request(`/${index}/${type}/`, value, 'POST').then((response: CreateResponse) => {
-        if (response && response._id) {
-          resolve(response._id)
-        } else {
-          reject({})
-        }
-      }).catch(err => {
-        reject(err)
-      })
+      ElasticClient.request(`/${index}/${type}/`, value, 'POST')
+        .then((response: CreateResponse) => {
+          if (response && response._id) {
+            resolve(response._id)
+          } else {
+            reject({})
+          }
+        }).catch((err: any) => {
+          reject(err)
+        })
     })
   },
 
   find: <T>(index: string, type: string, id: string) => {
     return new Promise<Document<T>>((resolve, reject) => {
-      ElasticClient.request(`/${index}/${type}/${id}`, {}, 'GET').then((response: Document<T>) => {
-        if (response && response._id) {
-          resolve(response)
-        } else {
-          reject({})
-        }
-      }).catch(err => {
-        reject(err)
-      })
+      ElasticClient.request(`/${index}/${type}/${id}`, {}, 'GET')
+        .then((response: Document<T>) => {
+          if (response && response._id) {
+            resolve(response)
+          } else {
+            reject({})
+          }
+        }).catch((err: any) => {
+          reject(err)
+        })
     })
   },
 
   query: <T>(index: string, type: string, query: Object) => {
     return new Promise<SearchResponse<T>>((resolve, reject) => {
-      ElasticClient.request(`/${index}/${type}/_search`, query, 'POST').then((response: SearchResponse<T>) => {
-        if (response) {
-          resolve(response)
-        } else {
-          reject({})
-        }
-      }).catch(err => {
-        reject(err)
-      })
+      ElasticClient.request(`/${index}/${type}/_search`, query, 'POST')
+        .then((response: SearchResponse<T>) => {
+          if (response) {
+            resolve(response)
+          } else {
+            reject({})
+          }
+        }).catch((err: any) => {
+          reject(err)
+        })
     })
   }
 }
