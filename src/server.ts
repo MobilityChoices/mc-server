@@ -18,7 +18,7 @@ const isTestEnvironment = process.env.NODE_ENV === 'test'
 
 const log = (message: string) => {
   if (!isProductionEnvironment) {
-    console.log(message) // tslint:disable-line:no-console
+    console.log(message)
   }
 }
 

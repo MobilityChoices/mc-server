@@ -3,15 +3,10 @@ import * as qs from 'qs'
 import elasticUrl from './elasticUrl'
 
 const ElasticClient = {
-  /**
-   * @param {string} requestPath
-   * @param {Object} data
-   * @param {string} method
-   */
   request: (requestPath = '', data = {}, method = 'GET') => {
     let payload = {}
 
-    console.log(`[Elastic] ${method}  ${requestPath}`) // tslint:disable-line:no-console
+    console.log(`[Elastic] ${method}  ${requestPath}`)
 
     switch (method) {
       case 'GET':
