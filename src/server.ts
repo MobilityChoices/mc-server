@@ -5,8 +5,10 @@ import env from './env'
 const schemas = require('./helpers/schemas')
 import { compare, hash } from './helpers/crypto'
 import validate from './helpers/validate'
-const userRepository = require('./services/storage/repositories/user')
-const trackRepository = require('./services/storage/repositories/track')
+import { Document } from './services/storage/repository'
+import userRepository from './services/storage/repositories/user'
+import trackRepository from './services/storage/repositories/track'
+import { isString, User, UserInfo } from './types'
 
 const server = new Hapi.Server()
 server.connection({ port: env.PORT })
@@ -21,18 +23,19 @@ const log = (message: string) => {
   }
 }
 
-async function register(request: Hapi.Request, reply: Hapi.IReply) {
-  try {
-    const validatedUser = await validate(request.payload, schemas.auth)
-    const password = await hash(validatedUser.password)
-    const user = Object.assign({}, validatedUser, { password })
-    const dbResponse = await userRepository.create(user)
-    reply({}).code(201)
-  } catch (error) {
-    log(error)
-    reply(error)
+const createUserInfo = (data: any): UserInfo | undefined => {
+  if (isString(data.email) && isString(data.password)) {
+    return {
+      email: data.email,
+      password: data.password,
+    }
   }
 }
+
+const setPassword = (userInfo: UserInfo, password: string): UserInfo => ({
+  email: userInfo.email,
+  password: password,
+})
 
 /**
  * Register a new user.
@@ -40,27 +43,18 @@ async function register(request: Hapi.Request, reply: Hapi.IReply) {
 server.route({
   method: 'POST',
   path: '/auth/register',
-  handler: register
-})
-
-
-async function login(request: Hapi.Request, reply: Hapi.IReply) {
-  try {
-    const validatedUser = await validate(request.payload, schemas.auth)
-    const user = await userRepository.findByEmail(validatedUser.email)
-    const passedPassword = validatedUser.password
-    const passwordHash = user._source.password
-    const passwordsMatch = await compare(passedPassword, passwordHash)
-    if (!passwordsMatch) {
-      throw Boom.badRequest()
+  handler: (request, reply) => {
+    const userInformation = createUserInfo(request.payload)
+    if (!userInformation) {
+      return reply({ success: false }).code(400)
     }
-    const token = await createToken({ userId: user._id })
-    reply(token)
-  } catch (error) {
-    log(error)
-    reply(error)
+    hash(userInformation.password)
+      .then(encryptedPassword => setPassword(userInformation, encryptedPassword))
+      .then(userInfo => userRepository.create(userInfo))
+      .then(response => reply({ success: true }))
+      .catch(err => reply({ success: false }).code(500))
   }
-}
+})
 
 /**
  * Log in a registered user.
@@ -68,17 +62,23 @@ async function login(request: Hapi.Request, reply: Hapi.IReply) {
 server.route({
   method: 'POST',
   path: '/auth/login',
-  handler: login
+  handler: (request, reply) => {
+    const userInfo = createUserInfo(request.payload)
+    if (!userInfo) {
+      return reply({ success: false }).code(400)
+    }
+    let user: Document<User>
+    userRepository.findByEmail(userInfo.email)
+      .then(u => user = u)
+      .then(user => compare(userInfo.password, user._source.password))
+      .then(passwordsMatch => createToken({ userId: user._id }))
+      .then(token => reply(token))
+      .catch(err => reply(err))
+  }
 })
 
-async function whoami(request: Hapi.Request, reply: Hapi.IReply) {
-  try {
-    const user = await getCurrentUser(request.headers['authorization'])
-    return reply(Object.assign({}, user._source, { password: undefined }))
-  } catch (error) {
-    log(error)
-    return reply({})
-  }
+const sanitizeUser = (user: User) => {
+  return Object.assign({}, user, { password: undefined })
 }
 
 /**
@@ -87,34 +87,13 @@ async function whoami(request: Hapi.Request, reply: Hapi.IReply) {
 server.route({
   method: 'GET',
   path: '/me',
-  handler: whoami
-})
-
-async function createTrack(request: Hapi.Request, reply: Hapi.IReply) {
-  try {
-    const user = await getCurrentUser(request.headers['authorization'])
-    const validatedTrack = await validate(request.payload, schemas.track)
-    const dbResponse = await trackRepository.create(validatedTrack)
-    reply(validatedTrack).code(201)
-  } catch (error) {
-    log(error)
-    reply(error)
+  handler: (request, reply) => {
+    const userToken = request.headers['authorization']
+    verifyToken(userToken)
+      .then(token => userRepository.find(token.userId))
+      .then(user => reply(sanitizeUser(user._source)))
+      .catch(err => reply(err).code(400))
   }
-}
-
-/**
- * Create a new track.
- */
-server.route({
-  method: 'POST',
-  path: '/tracks',
-  handler: createTrack
 })
-
-async function getCurrentUser(token: string) {
-  const tokenPayload = await verifyToken(token)
-  const user = await userRepository.find(tokenPayload.userId)
-  return user
-}
 
 export default server

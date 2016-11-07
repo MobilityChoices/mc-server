@@ -5,7 +5,7 @@ const signOptions = {
   noTimestamp: true,
 }
 
-export const createToken = (payload: Object) => {
+export const createToken = (payload: Token) => {
   return new Promise((resolve, reject) => {
     JWT.sign(payload, env.SECRET_KEY, signOptions, (err, token) => {
       if (err) {
@@ -16,8 +16,12 @@ export const createToken = (payload: Object) => {
   })
 }
 
+interface Token {
+  userId: string
+}
+
 export const verifyToken = (token: string) => {
-  return new Promise((resolve, reject) => {
+  return new Promise<Token>((resolve, reject) => {
     JWT.verify(token, env.SECRET_KEY, {}, (err, payload) => {
       if (err) {
         return reject(err)
