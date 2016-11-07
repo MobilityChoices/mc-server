@@ -1,30 +1,21 @@
-import * as bcrypt from 'bcrypt'
+import { createHmac, randomBytes } from 'crypto'
 
-const HASHING_ROUNDS = 10
+const SALT_LENGTH = 16
 
-/**
- * @param {string} data
- */
-export const hash = (data: string) => {
-  return new Promise<string>((resolve, reject) => {
-    bcrypt.hash(data, HASHING_ROUNDS, (err: Error, hash: string) => {
-      if (err) {
-        return reject(err)
-      }
-      return resolve(hash)
-    })
-  })
+const generateRandomSalt = (length: number) => {
+    return randomBytes(Math.ceil(length / 2)).toString('hex').slice(0, length)
 }
 
-/**
- * @param {string} data
- * @param {string} hash
- */
-export const compare = (data: string, hash: string) => new Promise((resolve, reject) => {
-  bcrypt.compare(data, hash, (err, result) => {
-    if (err) {
-      return reject(err)
-    }
-    return resolve(result)
-  })
-})
+export const hash = (data: string, salt: string) => {
+    const value = createHmac('sha512', salt).update(data).digest('hex')
+    return `${salt}.${value}`
+}
+
+export const encrypt = (data: string) => {
+  return hash(data, generateRandomSalt(SALT_LENGTH))
+}
+
+export const compare = (data: string, encryptedData: string) => {
+    const [salt, _] = encryptedData.split('.')
+    return hash(data, salt) === encryptedData
+}
