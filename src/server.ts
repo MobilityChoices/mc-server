@@ -1,10 +1,7 @@
-import * as Boom from 'boom'
 import * as Hapi from 'hapi'
 import { createToken, verifyToken } from './helpers/auth'
 import env from './env'
-const schemas = require('./helpers/schemas')
-import { compare, hash } from './helpers/crypto'
-import validate from './helpers/validate'
+import { encrypt, compare } from './helpers/crypto'
 import { Document } from './services/storage/repository'
 import userRepository from './services/storage/repositories/user'
 import trackRepository from './services/storage/repositories/track'
@@ -47,9 +44,9 @@ server.route({
     if (!userInformation) {
       return reply({ success: false }).code(400)
     }
-    hash(userInformation.password)
-      .then(encryptedPassword => setPassword(userInformation, encryptedPassword))
-      .then(userInfo => userRepository.create(userInfo))
+    const encryptedPassword = encrypt(userInformation.password)
+    userInformation.password = encryptedPassword
+    userRepository.create(userInformation)
       .then(response => reply({ success: true }))
       .catch(err => reply({ success: false }).code(500))
   }
@@ -87,9 +84,11 @@ server.route({
   method: 'GET',
   path: '/me',
   handler: (request, reply) => {
-    const userToken = request.headers['authorization']
-    verifyToken(userToken)
-      .then(token => userRepository.find(token.userId))
+    const token = verifyToken(request.headers['authorization'])
+    if (!token) {
+      return reply({}).code(400)
+    }
+    userRepository.find(token.userId)
       .then(user => reply(sanitizeUser(user._source)))
       .catch(err => reply(err).code(400))
   }
