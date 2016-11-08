@@ -37,7 +37,7 @@
   "devDependencies": {
     "@types/axios": "0.9.33",
     "@types/chai": "3.4.34",
-    "@types/hapi": "13.0.36",
+    "@types/hapi": "13.0.37",
     "@types/joi": "9.0.32",
     "@types/jsonwebtoken": "7.1.33",
     "@types/mocha": "2.2.32",
@@ -47,6 +47,6 @@
     "mocha": "3.1.2",
     "sinon": "1.17.6",
     "tslint": "3.15.1",
-    "typescript": "2.0.7"
+    "typescript": "2.0.8"
   }
 }
