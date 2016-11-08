@@ -237,4 +237,83 @@ describe('server', () => {
       })
     })
   })
+
+  const userDocument = {
+    _index: 'users',
+    _type: 'default',
+    _id: '__ID__',
+    _source: {
+      email: 'alpha@beta.gamma',
+      // tslint:disable-next-line: max-line-length
+      password: 'af21c41de791b9be.845b99a241e7ef7e25152563d1fb2dbc5431a592c6b52b33ec8347652656aac16f201b5c571488d536981903cb884a19166bd36d6af1873a992cd3c37deda8d2',
+    }
+  }
+
+  describe('POST /auth/login', () => {
+    let user$findByEmail: sinon.SinonStub
+
+    context('valid data', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'findByEmail')
+        user$findByEmail = userRepository.findByEmail as sinon.SinonStub
+        user$findByEmail.returns(Promise.resolve(userDocument))
+      })
+
+      afterEach(() => {
+        user$findByEmail.restore()
+      })
+
+      const request = {
+        headers: {
+          'content-type': 'application/json',
+        },
+        method: 'POST',
+        url: '/auth/login',
+        payload: {
+          email: 'alpha@beta.gamma',
+          password: 'abcdefg',
+        }
+      }
+
+      it('responds with status code 200', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 200)
+          done()
+        })
+      })
+
+      it('returns a token', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isDefined(body.token)
+          assert.isString(body.token)
+          done()
+        })
+      })
+    })
+
+    context('missing email', () => {
+
+    })
+
+    context('invalid email', () => {
+
+    })
+
+    context('no user with this email', () => {
+
+    })
+
+    context('missing password', () => {
+
+    })
+
+    context('invalid password', () => {
+
+    })
+
+    context('server error', () => {
+
+    })
+  })
 })
