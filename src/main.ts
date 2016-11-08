@@ -1,4 +1,7 @@
-import server from './server'
+import createServer from './server'
+import env from './env'
+
+const server = createServer(env.PORT)
 
 server.start((err) => {
   if (err) {

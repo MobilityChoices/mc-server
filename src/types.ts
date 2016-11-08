@@ -1,12 +1,13 @@
 import * as Joi from 'joi'
 
 export const isString = (v: any): v is string => {
-  return typeof v === 'string'
+  const result = Joi.validate(v, Joi.string().required())
+  return result.error === null
 }
 
 export const isEmail = (v: string): boolean => {
-  const result = Joi.validate(v, Joi.string().email())
-  return (!result.error && result.value === v)
+  const result = Joi.validate(v, Joi.string().email().required())
+  return result.error === null
 }
 
 export const isArray = <T>(v: T[]): v is Array<T> => {
