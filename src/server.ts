@@ -122,10 +122,13 @@ const createServer = (port: number) => {
         let user: Document<User>
         userRepository.findByEmail(userInfo.email)
           .then(u => user = u)
-          .then(user => compare(userInfo.password, user._source.password))
-          .then(passwordsMatch => createToken({ userId: user._id }))
-          .then(token => reply({ token }).code(200))
-          .catch(err => reply(err).code(500))
+          .then(user => {
+            if (compare(userInfo.password, user._source.password)) {
+              const token = createToken({ userId: user._id })
+              reply({ token }).code(200)
+            }
+          })
+          .catch(err => { reply(err).code(400) })
       }
     }
   })
