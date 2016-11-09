@@ -359,6 +359,14 @@ describe('server', () => {
           done()
         })
       })
+
+      it('returns an error', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.equal(body.error.target, 'email')
+          done()
+        })
+      })
     })
 
     context('no user with this email', () => {
