@@ -352,6 +352,13 @@ describe('server', () => {
           password: 'abcdefg',
         }
       }
+
+      it('responds with status code 400', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 400)
+          done()
+        })
+      })
     })
 
     context('no user with this email', () => {
