@@ -293,6 +293,26 @@ describe('server', () => {
     })
 
     context('missing email', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'findByEmail')
+        user$findByEmail = userRepository.findByEmail as sinon.SinonStub
+        user$findByEmail.returns(Promise.resolve(userDocument))
+      })
+
+      afterEach(() => {
+        user$findByEmail.restore()
+      })
+
+      const request = {
+        headers: {
+          'content-type': 'application/json',
+        },
+        method: 'POST',
+        url: '/auth/login',
+        payload: {
+          password: 'abcdefg',
+        }
+      }
 
     })
 
