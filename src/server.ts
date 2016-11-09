@@ -126,9 +126,13 @@ const createServer = (port: number) => {
             if (compare(userInfo.password, user._source.password)) {
               const token = createToken({ userId: user._id })
               reply({ token }).code(200)
+            } else {
+              reply({ error: { aargh: 'invalid password' }}).code(400)
             }
           })
-          .catch(err => { reply(err).code(400) })
+          .catch(err => {
+            reply({ error: { hugh: 'what?' }}).code(400)
+          })
       }
     }
   })

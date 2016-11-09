@@ -4,6 +4,7 @@ import * as sinon from 'sinon'
 import createServer from '../src/server'
 import userRepository from '../src/services/storage/repositories/user'
 
+require('sinon-as-promised')(Promise)
 
 describe('server', () => {
   let userRepository$Create: sinon.SinonStub
@@ -205,7 +206,7 @@ describe('server', () => {
       beforeEach(() => {
         sinon.stub(userRepository, 'create')
         userRepository$Create = userRepository.create as sinon.SinonStub
-        userRepository$Create.returns(Promise.reject({}))
+        userRepository$Create.rejects(new Error('server error'))()
       })
 
       afterEach(() => {
@@ -373,7 +374,7 @@ describe('server', () => {
       beforeEach(() => {
         sinon.stub(userRepository, 'findByEmail')
         user$findByEmail = userRepository.findByEmail as sinon.SinonStub
-        user$findByEmail.returns(Promise.reject({}))
+        user$findByEmail.rejects(new Error('server error'))()
       })
 
       afterEach(() => {
