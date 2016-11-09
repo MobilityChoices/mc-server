@@ -117,7 +117,7 @@ const createServer = (port: number) => {
     handler: (request, reply) => {
       const [userInfo, error] = createUserInfo(request.payload)
       if (!userInfo) {
-        return reply({ success: false }).code(400)
+        return reply({ error: error || {} }).code(400)
       } else {
         let user: Document<User>
         userRepository.findByEmail(userInfo.email)
