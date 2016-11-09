@@ -331,7 +331,27 @@ describe('server', () => {
     })
 
     context('invalid email', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'findByEmail')
+        user$findByEmail = userRepository.findByEmail as sinon.SinonStub
+        user$findByEmail.returns(Promise.resolve(userDocument))
+      })
 
+      afterEach(() => {
+        user$findByEmail.restore()
+      })
+
+      const request = {
+        headers: {
+          'content-type': 'application/json',
+        },
+        method: 'POST',
+        url: '/auth/login',
+        payload: {
+          email: '@beta.gamma',
+          password: 'abcdefg',
+        }
+      }
     })
 
     context('no user with this email', () => {
