@@ -392,6 +392,12 @@ describe('server', () => {
         }
       }
 
+      it('responds with status code 400', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 400)
+          done()
+        })
+      })
     })
 
     context('missing password', () => {
