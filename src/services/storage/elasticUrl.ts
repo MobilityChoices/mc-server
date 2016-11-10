@@ -1,11 +1,5 @@
 import env from '../../env'
 
-/**
- * Constructs a URL to be used by the Elastic client.
- *
- * @param {string} requestPath
- * @returns {string} the full URL
- */
 const elasticUrl = (requestPath: string) => {
   const prefix = env.ELASTIC_URL
 

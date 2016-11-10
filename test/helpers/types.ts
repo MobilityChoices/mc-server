@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import * as types from '../src/types'
+import * as types from '../../src/helpers/types'
 
 describe('isEmail', () => {
   context('value is a valid email address', () => {

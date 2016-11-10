@@ -1,4 +1,4 @@
-import { User } from '../../../types'
+import { User } from '../../../helpers/types'
 import repository, { Document } from '../repository'
 
 const userRepository = {

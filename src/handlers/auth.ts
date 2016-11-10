@@ -6,10 +6,9 @@ import {
   isString,
   isEmail,
   Maybe,
-  Error,
   UserInfo,
-} from '../types'
-import { serverError }  from '../helpers/errors'
+} from '../helpers/types'
+import { serverError, Error }  from '../helpers/errors'
 
 async function login(request: Request, reply: IReply) {
   const [userInfo, error] = createUserInfo(request.payload)
@@ -28,7 +27,7 @@ async function login(request: Request, reply: IReply) {
       return reply({ error: {} }).code(400)
     }
   } catch (e) {
-    return reply(serverError).code(500)
+    return reply(serverError()).code(500)
   }
 }
 async function register(request: Request, reply: IReply) {
@@ -42,7 +41,7 @@ async function register(request: Request, reply: IReply) {
       const userId = await userRepository.create(userInfo)
       reply('').code(201)
     } catch (e) {
-      reply(serverError).code(500)
+      reply(serverError()).code(500)
     }
   }
 }

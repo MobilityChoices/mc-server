@@ -2,11 +2,8 @@ import * as Joi from 'joi'
 
 export type Maybe<T> = T | undefined
 
-export interface Error {
-  code: 'BadArgument' | 'ServerError'
-  message?: string
-  target?: string
-  details?: Error[]
+export const sanitizeUser = (user: User) => {
+  return Object.assign({}, user, { password: undefined })
 }
 
 export const isString = (v: any): v is string => {
