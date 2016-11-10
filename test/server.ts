@@ -429,6 +429,14 @@ describe('server', () => {
           done()
         })
       })
+
+      it('responds with an error', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isDefined(body.error)
+          done()
+        })
+      })
     })
 
     context('invalid password', () => {
