@@ -2,9 +2,25 @@ import * as Hapi from 'hapi'
 import auth from './handlers/auth'
 import user from './handlers/user'
 
-const createServer = (port: number) => {
+const createServer = (port: number, isTest = false) => {
   const server = new Hapi.Server()
   server.connection({ port: port })
+
+  if (!isTest) {
+    server.register({
+      register: require('good'),
+      options: {
+        ops: { interval: 1000 },
+        reporters: {
+          consoleReporter: [
+            { module: 'good-squeeze', name: 'Squeeze', args: [{ log: '*', response: '*' }] },
+            { module: 'good-console' },
+            'stdout'
+          ]
+        }
+      }
+    }, () => { })
+  }
 
   server.route({
     method: 'POST',
