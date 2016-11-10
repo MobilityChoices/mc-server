@@ -479,7 +479,34 @@ describe('server', () => {
     })
 
     context('server error', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'findByEmail')
+        user$findByEmail = userRepository.findByEmail as sinon.SinonStub
+        user$findByEmail.rejects(new Error('server error'))()
+      })
 
+      afterEach(() => {
+        user$findByEmail.restore()
+      })
+
+      const request = {
+        headers: {
+          'content-type': 'application/json',
+        },
+        method: 'POST',
+        url: '/auth/login',
+        payload: {
+          email: 'alpha@beta.gamma',
+          password: 'abcdefg',
+        }
+      }
+
+      it('responds with status code 500', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 500)
+          done()
+        })
+      })
     })
   })
 })
