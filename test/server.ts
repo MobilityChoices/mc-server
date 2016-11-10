@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 import { Server } from 'hapi'
 import * as sinon from 'sinon'
+import userDocument from './fixtures/userDocument'
 import createServer from '../src/server'
 import userRepository from '../src/services/storage/repositories/user'
 
@@ -277,17 +278,6 @@ describe('server', () => {
       })
     })
   })
-
-  const userDocument = {
-    _index: 'users',
-    _type: 'default',
-    _id: '__ID__',
-    _source: {
-      email: 'alpha@beta.gamma',
-      // tslint:disable-next-line: max-line-length
-      password: 'af21c41de791b9be.845b99a241e7ef7e25152563d1fb2dbc5431a592c6b52b33ec8347652656aac16f201b5c571488d536981903cb884a19166bd36d6af1873a992cd3c37deda8d2',
-    }
-  }
 
   describe('POST /auth/login', () => {
     let user$findByEmail: sinon.SinonStub
