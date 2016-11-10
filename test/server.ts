@@ -4,8 +4,6 @@ import * as sinon from 'sinon'
 import createServer from '../src/server'
 import userRepository from '../src/services/storage/repositories/user'
 
-require('sinon-as-promised')(Promise)
-
 describe('server', () => {
   let userRepository$Create: sinon.SinonStub
   let server: Server

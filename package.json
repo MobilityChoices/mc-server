@@ -11,7 +11,7 @@
     "lint": "npm run lint:src && npm run lint:test",
     "lint:src": "tslint 'src/**/*.ts'",
     "lint:test": "tslint 'test/**/*.ts'",
-    "test": "npm run build && mocha 'dist/test/**/*.js'"
+    "test": "npm run build && mocha --require 'scripts/test-setup.js' 'dist/test/**/*.js'"
   },
   "engines": {
     "node": "6.9.0"
