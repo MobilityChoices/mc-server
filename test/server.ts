@@ -374,7 +374,7 @@ describe('server', () => {
       beforeEach(() => {
         sinon.stub(userRepository, 'findByEmail')
         user$findByEmail = userRepository.findByEmail as sinon.SinonStub
-        user$findByEmail.rejects(new Error('server error'))()
+        user$findByEmail.resolves(undefined)()
       })
 
       afterEach(() => {

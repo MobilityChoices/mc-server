@@ -80,9 +80,10 @@ describe('userRepository', () => {
         query.returns(Promise.resolve({ hits: { hits: [] } }))
       })
 
-      it('rejects', (done) => {
+      it('resolves "undefined"', (done) => {
         userRepository.findByEmail('x@y.z')
-          .catch(err => {
+          .then(user => {
+            assert.isUndefined(user)
             done()
           })
       })

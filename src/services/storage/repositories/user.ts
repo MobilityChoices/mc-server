@@ -17,7 +17,7 @@ const userRepository = {
         if (response.hits.hits.length > 0) {
           resolve(response.hits.hits[0])
         } else {
-          reject({})
+          resolve(undefined)
         }
       }).catch(err => {
         reject(err)
