@@ -2,11 +2,11 @@ import * as Joi from 'joi'
 
 export type Maybe<T> = T | undefined
 
-export interface MCError {
+export interface Error {
   code: 'BadArgument' | 'ServerError'
   message?: string
   target?: string
-  details?: MCError[]
+  details?: Error[]
 }
 
 export const isString = (v: any): v is string => {
