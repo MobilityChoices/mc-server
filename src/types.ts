@@ -1,5 +1,14 @@
 import * as Joi from 'joi'
 
+export type Maybe<T> = T | undefined
+
+export interface MCError {
+  code: 'BadArgument' | 'ServerError'
+  message?: string
+  target?: string
+  details?: MCError[]
+}
+
 export const isString = (v: any): v is string => {
   const result = Joi.validate(v, Joi.string().required())
   return result.error === null
