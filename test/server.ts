@@ -440,6 +440,27 @@ describe('server', () => {
     })
 
     context('invalid password', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'findByEmail')
+        user$findByEmail = userRepository.findByEmail as sinon.SinonStub
+        user$findByEmail.returns(Promise.resolve(userDocument))
+      })
+
+      afterEach(() => {
+        user$findByEmail.restore()
+      })
+
+      const request = {
+        headers: {
+          'content-type': 'application/json',
+        },
+        method: 'POST',
+        url: '/auth/login',
+        payload: {
+          email: 'alpha@beta.gamma',
+          password: 'ab_defg',
+        }
+      }
 
     })
 
