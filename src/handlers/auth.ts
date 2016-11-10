@@ -41,6 +41,10 @@ async function register(request: Request, reply: IReply) {
   if (!userInfo) {
     return reply({ error: error || {} }).code(400)
   } else {
+    const emailUser = await userRepository.findByEmail(userInfo.email)
+    if (emailUser) {
+      return reply({ error: badArgumentError('email', 'already in use') }).code(400)
+    }
     const encryptedPassword = encrypt(userInfo.password)
     userInfo.password = encryptedPassword
     try {

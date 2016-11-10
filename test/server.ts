@@ -6,10 +6,11 @@ import userRepository from '../src/services/storage/repositories/user'
 
 describe('server', () => {
   let userRepository$Create: sinon.SinonStub
+  let userRepository$FindByEmail: sinon.SinonStub
   let server: Server
 
   before(() => {
-    server = createServer(6593)
+    server = createServer(6593, true)
   })
 
   after(() => {
@@ -22,10 +23,14 @@ describe('server', () => {
         sinon.stub(userRepository, 'create')
         userRepository$Create = userRepository.create as sinon.SinonStub
         userRepository$Create.returns(Promise.resolve('__ID__'))
+        sinon.stub(userRepository, 'findByEmail')
+        userRepository$FindByEmail = userRepository.findByEmail as sinon.SinonStub
+        userRepository$FindByEmail.resolves(undefined)
       })
 
       afterEach(() => {
         userRepository$Create.restore()
+        userRepository$FindByEmail.restore()
       })
 
       const request = {
@@ -129,6 +134,38 @@ describe('server', () => {
       })
     })
 
+    context('email already used', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'create')
+        userRepository$Create = userRepository.create as sinon.SinonStub
+        userRepository$Create.returns(Promise.resolve('__ID__'))
+        sinon.stub(userRepository, 'findByEmail')
+        userRepository$FindByEmail = userRepository.findByEmail as sinon.SinonStub
+        userRepository$FindByEmail.resolves(userDocument)
+      })
+
+      afterEach(() => {
+        userRepository$Create.restore()
+        userRepository$FindByEmail.restore()
+      })
+
+      const request = {
+        method: 'POST',
+        url: '/auth/register',
+        payload: {
+          email: 'alpha@beta.gamma',
+          password: 'abcdefg',
+        }
+      }
+
+      it('responds with status code 400', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 400)
+          done()
+        })
+      })
+    })
+
     context('missing password', () => {
       beforeEach(() => {
         sinon.stub(userRepository, 'create')
@@ -205,10 +242,14 @@ describe('server', () => {
         sinon.stub(userRepository, 'create')
         userRepository$Create = userRepository.create as sinon.SinonStub
         userRepository$Create.rejects(new Error('server error'))()
+        sinon.stub(userRepository, 'findByEmail')
+        userRepository$FindByEmail = userRepository.findByEmail as sinon.SinonStub
+        userRepository$FindByEmail.resolves(undefined)
       })
 
       afterEach(() => {
         userRepository$Create.restore()
+        userRepository$FindByEmail.restore()
       })
 
       const request = {
