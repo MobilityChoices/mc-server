@@ -399,6 +399,14 @@ describe('server', () => {
           done()
         })
       })
+
+      it('returns an error', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isDefined(body.error)
+          done()
+        })
+      })
     })
 
     context('missing password', () => {
