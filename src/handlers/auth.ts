@@ -1,6 +1,6 @@
 import { Request, IReply } from 'hapi'
 import userRepository from '../services/storage/repositories/user'
-import { createToken, verifyToken } from '../helpers/auth'
+import { createToken } from '../helpers/auth'
 import { compare, encrypt } from '../helpers/crypto'
 import {
   isString,
@@ -8,7 +8,12 @@ import {
   Maybe,
   UserInfo,
 } from '../helpers/types'
-import { serverError, Error }  from '../helpers/errors'
+import {
+  Error,
+  badArgumentError,
+  serverError,
+  malformedValueError,
+}  from '../helpers/errors'
 
 async function login(request: Request, reply: IReply) {
   const [userInfo, error] = createUserInfo(request.payload)
@@ -27,9 +32,10 @@ async function login(request: Request, reply: IReply) {
       return reply({ error: {} }).code(400)
     }
   } catch (e) {
-    return reply(serverError()).code(500)
+    return reply({ error: serverError() }).code(500)
   }
 }
+
 async function register(request: Request, reply: IReply) {
   const [userInfo, error] = createUserInfo(request.payload)
   if (!userInfo) {
@@ -39,9 +45,13 @@ async function register(request: Request, reply: IReply) {
     userInfo.password = encryptedPassword
     try {
       const userId = await userRepository.create(userInfo)
-      reply('').code(201)
+      if (userId) {
+        reply('').code(201)
+      } else {
+        reply({ error: serverError() }).code(500)
+      }
     } catch (e) {
-      reply(serverError()).code(500)
+      reply({ error: serverError() }).code(500)
     }
   }
 }
@@ -56,10 +66,6 @@ export const isValidPassword = (str: any) => {
 }
 
 export const createUserInfo = (data: any): [Maybe<UserInfo>, Maybe<Error>] => {
-  let error: Maybe<Error>
-  let emailError: any
-  let passwordError: any
-
   if (isEmail(data.email) && isValidPassword(data.password)) {
     const userInfo = {
       email: data.email,
@@ -68,37 +74,16 @@ export const createUserInfo = (data: any): [Maybe<UserInfo>, Maybe<Error>] => {
     return [userInfo, undefined]
   }
 
+  const details: any[] = []
   if (!isEmail(data.email)) {
-    emailError = {
-      code: 'MalformedValue',
-      target: 'email',
-      message: 'email is not valid'
-    }
+    details.push(malformedValueError('email', 'email is not valid'))
   }
   if (!isString(data.password) || data.password.length <= 3) {
-    passwordError = {
-      code: 'MalformedValue',
-      target: 'password',
-      message: 'password is not valid'
-    }
+    details.push(malformedValueError('password', 'password is not valid'))
   }
-  if (emailError || passwordError) {
-    if (emailError && passwordError) {
-      error = {
-        code: 'BadArgument',
-        message: 'Multiple errors in data',
-        target: 'data',
-        details: [
-          emailError,
-          passwordError
-        ]
-      }
-    } else if (emailError) {
-      error = emailError
-    } else {
-      error = passwordError
-    }
+  if (details.length === 1) {
+    return [undefined, details[0]]
+  } else {
+    return [undefined, badArgumentError('data', 'multiple errors', ...details)]
   }
-
-  return [undefined, error]
 }
