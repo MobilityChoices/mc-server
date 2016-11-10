@@ -16,6 +16,6 @@ export const encrypt = (data: string) => {
 }
 
 export const compare = (data: string, encryptedData: string) => {
-    const [salt, _] = encryptedData.split('.')
+    const [salt] = encryptedData.split('.')
     return hash(data, salt) === encryptedData
 }
