@@ -5,7 +5,7 @@ import { compare, encrypt } from '../helpers/crypto'
 import {
   isString,
   isEmail,
-  Maybe,
+  isValidPassword,
   UserInfo,
 } from '../helpers/types'
 import {
@@ -13,19 +13,19 @@ import {
   badArgumentError,
   serverError,
   malformedValueError,
-}  from '../helpers/errors'
+} from '../helpers/errors'
 
 async function login(request: Request, reply: IReply) {
-  const [userInfo, error] = createUserInfo(request.payload)
-  if (!userInfo) {
-    return reply({ error: error || {} }).code(400)
+  const result = createUserInfo(request.payload)
+  if (!result.success) {
+    return reply({ error: result.error || {} }).code(400)
   }
   try {
-    const user = await userRepository.findByEmail(userInfo.email)
+    const user = await userRepository.findByEmail(result.userInfo.email)
     if (!user) {
       return reply({ error: {} }).code(400)
     }
-    if (compare(userInfo.password, user._source.password)) {
+    if (compare(result.userInfo.password, user._source.password)) {
       const token = createToken({ userId: user._id })
       return reply({ token }).code(200)
     } else {
@@ -37,18 +37,18 @@ async function login(request: Request, reply: IReply) {
 }
 
 async function register(request: Request, reply: IReply) {
-  const [userInfo, error] = createUserInfo(request.payload)
-  if (!userInfo) {
-    return reply({ error: error || {} }).code(400)
+  const result = createUserInfo(request.payload)
+  if (!result.success) {
+    return reply({ error: result.error || {} }).code(400)
   } else {
-    const emailUser = await userRepository.findByEmail(userInfo.email)
+    const emailUser = await userRepository.findByEmail(result.userInfo.email)
     if (emailUser) {
       return reply({ error: badArgumentError('email', 'already in use') }).code(400)
     }
-    const encryptedPassword = encrypt(userInfo.password)
-    userInfo.password = encryptedPassword
+    const encryptedPassword = encrypt(result.userInfo.password)
+    result.userInfo.password = encryptedPassword
     try {
-      const userId = await userRepository.create(userInfo)
+      const userId = await userRepository.create(result.userInfo)
       if (userId) {
         reply('').code(201)
       } else {
@@ -65,17 +65,17 @@ export default {
   register,
 }
 
-export const isValidPassword = (str: any) => {
-  return isString(str) && str.length > 3
-}
+type UserInfoResult =
+  { success: true; userInfo: UserInfo } |
+  { success: false; error: Error }
 
-export const createUserInfo = (data: any): [Maybe<UserInfo>, Maybe<Error>] => {
+export const createUserInfo = (data: any): UserInfoResult => {
   if (isEmail(data.email) && isValidPassword(data.password)) {
     const userInfo = {
       email: data.email,
       password: data.password,
     }
-    return [userInfo, undefined]
+    return { success: true, userInfo }
   }
 
   const details: any[] = []
@@ -86,8 +86,8 @@ export const createUserInfo = (data: any): [Maybe<UserInfo>, Maybe<Error>] => {
     details.push(malformedValueError('password', 'password is not valid'))
   }
   if (details.length === 1) {
-    return [undefined, details[0]]
+    return { success: false, error: details[0] }
   } else {
-    return [undefined, badArgumentError('data', 'multiple errors', ...details)]
+    return { success: false, error: badArgumentError('data', 'multiple errors', ...details) }
   }
 }

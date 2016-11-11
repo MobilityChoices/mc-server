@@ -16,6 +16,10 @@ export const isEmail = (v: string): boolean => {
   return result.error === null
 }
 
+export const isValidPassword = (str: any) => {
+  return isString(str) && str.length > 3
+}
+
 export const isArray = <T>(v: T[]): v is Array<T> => {
   return Array.isArray(v)
 }
