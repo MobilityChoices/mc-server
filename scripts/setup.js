@@ -1,4 +1,4 @@
-const ElasticClient = require('../src/services/storage/client')
+const ElasticClient = require('../dist/src/services/storage/client').default
 
 const INDEX_SETTINGS = {
   index: {
