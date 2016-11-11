@@ -2,6 +2,7 @@ import { assert } from 'chai'
 import { Server } from 'hapi'
 import * as sinon from 'sinon'
 import userDocument from './fixtures/userDocument'
+import token from './fixtures/token'
 import createServer from '../src/server'
 import userRepository from '../src/services/storage/repositories/user'
 
@@ -536,6 +537,148 @@ describe('server', () => {
           email: 'alpha@beta.gamma',
           password: 'abcdefg',
         }
+      }
+
+      it('responds with status code 500', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 500)
+          done()
+        })
+      })
+
+      it('returns an error', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isDefined(body.error)
+          done()
+        })
+      })
+    })
+  })
+
+  describe('GET /me', () => {
+    let user$find: sinon.SinonStub
+
+    context('valid data', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'find')
+        user$find = userRepository.find as sinon.SinonStub
+        user$find.resolves(userDocument)
+      })
+
+      afterEach(() => {
+        user$find.restore()
+      })
+
+      const request = {
+        headers: {
+          'Authorization': token,
+        },
+        method: 'GET',
+        url: '/me',
+      }
+
+      it('responds with status code 200', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 200)
+          done()
+        })
+      })
+
+      it('returns the profile', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isDefined(body.email)
+          done()
+        })
+      })
+    })
+
+    context('missing authorization token', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'find')
+        user$find = userRepository.find as sinon.SinonStub
+        user$find.resolves(userDocument)
+      })
+
+      afterEach(() => {
+        user$find.restore()
+      })
+
+      const request = {
+        headers: {},
+        method: 'GET',
+        url: '/me',
+      }
+
+      it('responds with status code 401', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 401)
+          done()
+        })
+      })
+
+      it('returns an error', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isDefined(body.error)
+          done()
+        })
+      })
+    })
+
+    context('user not found', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'find')
+        user$find = userRepository.find as sinon.SinonStub
+        user$find.resolves(undefined)
+      })
+
+      afterEach(() => {
+        user$find.restore()
+      })
+
+      const request = {
+        headers: {
+          'Authorization': token,
+        },
+        method: 'GET',
+        url: '/me',
+      }
+
+      it('responds with status code 400', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 400)
+          done()
+        })
+      })
+
+      it('returns an error', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isDefined(body.error)
+          done()
+        })
+      })
+    })
+
+    context('server error', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'find')
+        user$find = userRepository.find as sinon.SinonStub
+        user$find.rejects(new Error('server error'))()
+      })
+
+      afterEach(() => {
+        user$find.restore()
+      })
+
+      const request = {
+        headers: {
+          'Authorization': token,
+        },
+        method: 'GET',
+        url: '/me',
       }
 
       it('responds with status code 500', (done) => {
