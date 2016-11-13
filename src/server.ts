@@ -1,6 +1,7 @@
 import * as Hapi from 'hapi'
 import auth from './handlers/auth'
-import user from './handlers/user'
+import users from './handlers/users'
+import tracks from './handlers/tracks'
 
 const createServer = (port: number, isTest = false) => {
   const server = new Hapi.Server()
@@ -37,7 +38,13 @@ const createServer = (port: number, isTest = false) => {
   server.route({
     method: 'GET',
     path: '/me',
-    handler: user.me,
+    handler: users.me,
+  })
+
+  server.route({
+    method: 'POST',
+    path: '/tracks',
+    handler: tracks.create
   })
 
   return server
