@@ -697,4 +697,30 @@ describe('server', () => {
       })
     })
   })
+
+  describe('POST /tracks', () => {
+    context('valid data', () => {
+      beforeEach(() => {
+      })
+
+      afterEach(() => {
+
+      })
+
+      const request = {
+        headers: {
+          'Authorization': token,
+        },
+        method: 'POST',
+        url: '/tracks',
+      }
+
+      it('responds with status code 201', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 201)
+          done()
+        })
+      })
+    })
+  })
 })
