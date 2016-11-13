@@ -50,7 +50,7 @@ export const isUser = (maybeUser: any): maybeUser is User => {
 export interface Location {
   latitude: number
   longitude: number
-  time: Date
+  time: string
 }
 
 export const isLocation = (maybeLocation: any): maybeLocation is Location => {
