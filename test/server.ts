@@ -722,5 +722,27 @@ describe('server', () => {
         })
       })
     })
+
+    context('unauthorized', () => {
+      beforeEach(() => {
+      })
+
+      afterEach(() => {
+
+      })
+
+      const request = {
+        headers: {},
+        method: 'POST',
+        url: '/tracks',
+      }
+
+      it('responds with status code 401', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 401)
+          done()
+        })
+      })
+    })
   })
 })
