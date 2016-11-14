@@ -30,8 +30,27 @@ async function create(request: Request, reply: IReply) {
   }
 }
 
+async function all(request: Request, reply: IReply) {
+  try {
+    const user = await getAuthenticatedUser(request.headers['authorization'])
+    if (!user) {
+      return reply({ error: authenticationError() }).code(401)
+    }
+    if (!user._source.isAdmin) {
+      return reply({ error: {} }).code(403)
+    }
+    const from = Math.max(request.query.$skip, 0) || 0
+    const size = Math.min(Math.max(0, request.query.$top), 25)
+    const tracks = await trackRepository.all({ from, size })
+    reply(tracks.hits).code(200)
+  } catch (e) {
+    reply({ error: serverError() }).code(500)
+  }
+}
+
 export default {
   create,
+  all,
 }
 
 type TrackInfoResult =

@@ -1,7 +1,9 @@
 import { assert } from 'chai'
-import { Server } from 'hapi'
+import { Server, IServerInjectOptions } from 'hapi'
 import * as sinon from 'sinon'
 import userDocument from './fixtures/userDocument'
+import adminDocument from './fixtures/adminDocument'
+import allTrackDocuments from './fixtures/allTrackDocuments'
 import token from './fixtures/token'
 import createServer from '../src/server'
 import userRepository from '../src/services/storage/repositories/user'
@@ -9,6 +11,7 @@ import trackRepository from '../src/services/storage/repositories/track'
 
 describe('server', () => {
   let userRepository$Create: sinon.SinonStub
+  let userRepository$Find: sinon.SinonStub
   let userRepository$FindByEmail: sinon.SinonStub
   let trackRepository$Create: sinon.SinonStub
   let server: Server
@@ -701,21 +704,19 @@ describe('server', () => {
   })
 
   describe('POST /tracks', () => {
-    let userRepository$find: sinon.SinonStub
-
     context('valid data', () => {
       beforeEach(() => {
         sinon.stub(trackRepository, 'create')
         trackRepository$Create = trackRepository.create as sinon.SinonStub
         trackRepository$Create.resolves('__ID__')
         sinon.stub(userRepository, 'find')
-        userRepository$find = userRepository.find as sinon.SinonStub
-        userRepository$find.resolves(userDocument)
+        userRepository$Find = userRepository.find as sinon.SinonStub
+        userRepository$Find.resolves(userDocument)
       })
 
       afterEach(() => {
         trackRepository$Create.restore()
-        userRepository$find.restore()
+        userRepository$Find.restore()
       })
 
       const request = {
@@ -749,13 +750,13 @@ describe('server', () => {
         trackRepository$Create = trackRepository.create as sinon.SinonStub
         trackRepository$Create.resolves('__ID__')
         sinon.stub(userRepository, 'find')
-        userRepository$find = userRepository.find as sinon.SinonStub
-        userRepository$find.resolves(userDocument)
+        userRepository$Find = userRepository.find as sinon.SinonStub
+        userRepository$Find.resolves(userDocument)
       })
 
       afterEach(() => {
         trackRepository$Create.restore()
-        userRepository$find.restore()
+        userRepository$Find.restore()
       })
 
       const request = {
@@ -795,13 +796,13 @@ describe('server', () => {
         trackRepository$Create = trackRepository.create as sinon.SinonStub
         trackRepository$Create.resolves('__ID__')
         sinon.stub(userRepository, 'find')
-        userRepository$find = userRepository.find as sinon.SinonStub
-        userRepository$find.resolves(userDocument)
+        userRepository$Find = userRepository.find as sinon.SinonStub
+        userRepository$Find.resolves(userDocument)
       })
 
       afterEach(() => {
         trackRepository$Create.restore()
-        userRepository$find.restore()
+        userRepository$Find.restore()
       })
 
       const request = {
@@ -835,13 +836,13 @@ describe('server', () => {
         trackRepository$Create = trackRepository.create as sinon.SinonStub
         trackRepository$Create.rejects(new Error('server error'))()
         sinon.stub(userRepository, 'find')
-        userRepository$find = userRepository.find as sinon.SinonStub
-        userRepository$find.resolves(userDocument)
+        userRepository$Find = userRepository.find as sinon.SinonStub
+        userRepository$Find.resolves(userDocument)
       })
 
       afterEach(() => {
         trackRepository$Create.restore()
-        userRepository$find.restore()
+        userRepository$Find.restore()
       })
 
       const request = {
@@ -872,6 +873,88 @@ describe('server', () => {
         server.inject(request, (response) => {
           const body = JSON.parse(response.payload)
           assert.isDefined(body.error)
+          done()
+        })
+      })
+    })
+  })
+
+  describe('GET /tracks', () => {
+    let trackRepository$All: sinon.SinonStub
+
+    context('is admin', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'find')
+        userRepository$Find = userRepository.find as sinon.SinonStub
+        userRepository$Find.resolves(adminDocument)
+        sinon.stub(trackRepository, 'all')
+        trackRepository$All = trackRepository.all as sinon.SinonStub
+        trackRepository$All.resolves(allTrackDocuments)
+      })
+
+      afterEach(() => {
+        userRepository$Find.restore()
+        trackRepository$All.restore()
+      })
+
+      const request: IServerInjectOptions = {
+        method: 'GET',
+        url: '/tracks',
+        headers: {
+          'Authorization': token,
+        },
+      }
+
+      it('responds with status code 200', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 200)
+          done()
+        })
+      })
+
+      it('returns track documents', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isArray(body.hits)
+          done()
+        })
+      })
+    })
+
+    context('is not admin', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'find')
+        userRepository$Find = userRepository.find as sinon.SinonStub
+        userRepository$Find.resolves(userDocument)
+        sinon.stub(trackRepository, 'all')
+        trackRepository$All = trackRepository.all as sinon.SinonStub
+        trackRepository$All.resolves(allTrackDocuments)
+      })
+
+      afterEach(() => {
+        userRepository$Find.restore()
+        trackRepository$All.restore()
+      })
+
+      const request: IServerInjectOptions = {
+        method: 'GET',
+        url: '/tracks',
+        headers: {
+          'Authorization': token,
+        },
+      }
+
+      it('responds with status code 403', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 403)
+          done()
+        })
+      })
+
+      it('returns an error', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isObject(body.error)
           done()
         })
       })
