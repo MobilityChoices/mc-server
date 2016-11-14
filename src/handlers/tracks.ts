@@ -10,14 +10,14 @@ import trackRepository from '../services/storage/repositories/track'
 import { getAuthenticatedUser } from '../helpers/auth'
 
 async function create(request: Request, reply: IReply) {
-  const result = createTrackInfo(request.payload)
-  if (!result.success) {
-    return reply({ error: result.error }).code(400)
-  }
   try {
     const user = await getAuthenticatedUser(request.headers['authorization'])
     if (!user) {
       return reply({ error: authenticationError() }).code(401)
+    }
+    const result = createTrackInfo(request.payload, user._id)
+    if (!result.success) {
+      return reply({ error: result.error }).code(400)
     }
     const trackId = await trackRepository.create(result.trackInfo)
     if (trackId) {
@@ -38,9 +38,10 @@ type TrackInfoResult =
   { success: true, trackInfo: Track } |
   { success: false, error: Error }
 
-export const createTrackInfo = (data: any): TrackInfoResult => {
+export const createTrackInfo = (data: any, owner: string): TrackInfoResult => {
   if (isTrack(data)) {
     const trackInfo = {
+      owner,
       locations: data.locations.map((l: any) => ({
         location: {
           lon: l.longitude,

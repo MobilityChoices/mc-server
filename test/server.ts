@@ -794,7 +794,9 @@ describe('server', () => {
         sinon.stub(trackRepository, 'create')
         trackRepository$Create = trackRepository.create as sinon.SinonStub
         trackRepository$Create.resolves('__ID__')
-
+        sinon.stub(userRepository, 'find')
+        userRepository$find = userRepository.find as sinon.SinonStub
+        userRepository$find.resolves(userDocument)
       })
 
       afterEach(() => {

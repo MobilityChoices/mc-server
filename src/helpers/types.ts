@@ -66,6 +66,7 @@ export const isLocation = (maybeLocation: any): maybeLocation is Location => {
 
 export interface Track {
   locations: Location[]
+  owner: string
 }
 
 export const isTrack = (maybeTrack: any): maybeTrack is Track => {
