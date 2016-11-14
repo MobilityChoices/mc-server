@@ -42,8 +42,10 @@ export const createTrackInfo = (data: any): TrackInfoResult => {
   if (isTrack(data)) {
     const trackInfo = {
       locations: data.locations.map((l: any) => ({
-        lon: l.longitude,
-        lat: l.latitude,
+        location: {
+          lon: l.longitude,
+          lat: l.latitude,
+        },
         time: l.time
       }))
     }

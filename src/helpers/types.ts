@@ -48,16 +48,18 @@ export const isUser = (maybeUser: any): maybeUser is User => {
 }
 
 export interface Location {
-  lat: number
-  lon: number
+  location: {
+    lat: number
+    lon: number
+  }
   time: string
 }
 
 export const isLocation = (maybeLocation: any): maybeLocation is Location => {
-  const location = (maybeLocation || {}) as Location
+  const location = (maybeLocation || { location: {} }) as Location
   return (
-    isNumber(location.lat) &&
-    isNumber(location.lon) &&
+    isNumber(location.location.lat) &&
+    isNumber(location.location.lon) &&
     isDate(location.time)
   )
 }
