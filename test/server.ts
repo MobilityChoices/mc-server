@@ -880,26 +880,106 @@ describe('server', () => {
   })
 
   describe('GET /tracks', () => {
-    let trackRepository$All: sinon.SinonStub
+    let trackRepository$Query: sinon.SinonStub
+
+    context('is authenticated', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'find')
+        userRepository$Find = userRepository.find as sinon.SinonStub
+        userRepository$Find.resolves(userDocument)
+        sinon.stub(trackRepository, 'query')
+        trackRepository$Query = trackRepository.query as sinon.SinonStub
+        trackRepository$Query.resolves(allTrackDocuments)
+      })
+
+      afterEach(() => {
+        userRepository$Find.restore()
+        trackRepository$Query.restore()
+      })
+
+      const request = {
+        method: 'GET',
+        url: '/tracks',
+        headers: {
+          'Authorization': token,
+        },
+      }
+
+      it('responds with status code 200', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 200)
+          done()
+        })
+      })
+
+      it('returns a list of tracks', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isArray(body.hits)
+          done()
+        })
+      })
+    })
+
+    context('is not authenticated', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'find')
+        userRepository$Find = userRepository.find as sinon.SinonStub
+        userRepository$Find.resolves(userDocument)
+        sinon.stub(trackRepository, 'query')
+        trackRepository$Query = trackRepository.query as sinon.SinonStub
+        trackRepository$Query.resolves(allTrackDocuments)
+      })
+
+      afterEach(() => {
+        userRepository$Find.restore()
+        trackRepository$Query.restore()
+      })
+
+      const request = {
+        method: 'GET',
+        url: '/tracks',
+        headers: {},
+      }
+
+      it('responds with status code 401', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 401)
+          done()
+        })
+      })
+
+      it('returns an error', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isObject(body.error)
+          done()
+        })
+      })
+    })
+  })
+
+  describe('GET /admin/tracks', () => {
+    let trackRepository$Query = trackRepository.query as sinon.SinonStub
 
     context('is admin', () => {
       beforeEach(() => {
         sinon.stub(userRepository, 'find')
         userRepository$Find = userRepository.find as sinon.SinonStub
         userRepository$Find.resolves(adminDocument)
-        sinon.stub(trackRepository, 'all')
-        trackRepository$All = trackRepository.all as sinon.SinonStub
-        trackRepository$All.resolves(allTrackDocuments)
+        sinon.stub(trackRepository, 'query')
+        trackRepository$Query = trackRepository.query as sinon.SinonStub
+        trackRepository$Query.resolves(allTrackDocuments)
       })
 
       afterEach(() => {
         userRepository$Find.restore()
-        trackRepository$All.restore()
+        trackRepository$Query.restore()
       })
 
-      const request: IServerInjectOptions = {
+      const request = {
         method: 'GET',
-        url: '/tracks',
+        url: '/admin/tracks',
         headers: {
           'Authorization': token,
         },
@@ -926,19 +1006,19 @@ describe('server', () => {
         sinon.stub(userRepository, 'find')
         userRepository$Find = userRepository.find as sinon.SinonStub
         userRepository$Find.resolves(userDocument)
-        sinon.stub(trackRepository, 'all')
-        trackRepository$All = trackRepository.all as sinon.SinonStub
-        trackRepository$All.resolves(allTrackDocuments)
+        sinon.stub(trackRepository, 'query')
+        trackRepository$Query = trackRepository.query as sinon.SinonStub
+        trackRepository$Query.resolves(allTrackDocuments)
       })
 
       afterEach(() => {
         userRepository$Find.restore()
-        trackRepository$All.restore()
+        trackRepository$Query.restore()
       })
 
       const request: IServerInjectOptions = {
         method: 'GET',
-        url: '/tracks',
+        url: '/admin/tracks',
         headers: {
           'Authorization': token,
         },
@@ -947,6 +1027,43 @@ describe('server', () => {
       it('responds with status code 403', (done) => {
         server.inject(request, (response) => {
           assert.equal(response.statusCode, 403)
+          done()
+        })
+      })
+
+      it('returns an error', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isObject(body.error)
+          done()
+        })
+      })
+    })
+
+    context('not authenticated', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'find')
+        userRepository$Find = userRepository.find as sinon.SinonStub
+        userRepository$Find.resolves(userDocument)
+        sinon.stub(trackRepository, 'query')
+        trackRepository$Query = trackRepository.query as sinon.SinonStub
+        trackRepository$Query.resolves(allTrackDocuments)
+      })
+
+      afterEach(() => {
+        userRepository$Find.restore()
+        trackRepository$Query.restore()
+      })
+
+      const request: IServerInjectOptions = {
+        method: 'GET',
+        url: '/admin/tracks',
+        headers: {},
+      }
+
+      it('responds with status code 401', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 401)
           done()
         })
       })
