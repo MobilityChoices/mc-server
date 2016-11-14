@@ -648,9 +648,9 @@ describe('server', () => {
         url: '/me',
       }
 
-      it('responds with status code 400', (done) => {
+      it('responds with status code 401', (done) => {
         server.inject(request, (response) => {
-          assert.equal(response.statusCode, 400)
+          assert.equal(response.statusCode, 401)
           done()
         })
       })
@@ -701,15 +701,21 @@ describe('server', () => {
   })
 
   describe('POST /tracks', () => {
+    let userRepository$find: sinon.SinonStub
+
     context('valid data', () => {
       beforeEach(() => {
         sinon.stub(trackRepository, 'create')
         trackRepository$Create = trackRepository.create as sinon.SinonStub
         trackRepository$Create.resolves('__ID__')
+        sinon.stub(userRepository, 'find')
+        userRepository$find = userRepository.find as sinon.SinonStub
+        userRepository$find.resolves(userDocument)
       })
 
       afterEach(() => {
         trackRepository$Create.restore()
+        userRepository$find.restore()
       })
 
       const request = {
@@ -742,10 +748,14 @@ describe('server', () => {
         sinon.stub(trackRepository, 'create')
         trackRepository$Create = trackRepository.create as sinon.SinonStub
         trackRepository$Create.resolves('__ID__')
+        sinon.stub(userRepository, 'find')
+        userRepository$find = userRepository.find as sinon.SinonStub
+        userRepository$find.resolves(userDocument)
       })
 
       afterEach(() => {
         trackRepository$Create.restore()
+        userRepository$find.restore()
       })
 
       const request = {
@@ -784,10 +794,12 @@ describe('server', () => {
         sinon.stub(trackRepository, 'create')
         trackRepository$Create = trackRepository.create as sinon.SinonStub
         trackRepository$Create.resolves('__ID__')
+
       })
 
       afterEach(() => {
         trackRepository$Create.restore()
+        userRepository$find.restore()
       })
 
       const request = {
@@ -820,10 +832,14 @@ describe('server', () => {
         sinon.stub(trackRepository, 'create')
         trackRepository$Create = trackRepository.create as sinon.SinonStub
         trackRepository$Create.rejects(new Error('server error'))()
+        sinon.stub(userRepository, 'find')
+        userRepository$find = userRepository.find as sinon.SinonStub
+        userRepository$find.resolves(userDocument)
       })
 
       afterEach(() => {
         trackRepository$Create.restore()
+        userRepository$find.restore()
       })
 
       const request = {

@@ -1,5 +1,4 @@
-import { Request, IReply } from 'hapi'
-import { verifyToken } from '../helpers/auth'
+import { Request, IReply } from 'hapi'
 import {
   Error,
   authenticationError,
@@ -8,17 +7,18 @@ import {
 } from '../helpers/errors'
 import { isTrack, Track } from '../helpers/types'
 import trackRepository from '../services/storage/repositories/track'
+import { getAuthenticatedUser } from '../helpers/auth'
 
 async function create(request: Request, reply: IReply) {
-  const token = verifyToken(request.headers['authorization'])
-  if (!token) {
-    return reply({ error: authenticationError() }).code(401)
-  }
   const result = createTrackInfo(request.payload)
   if (!result.success) {
     return reply({ error: result.error }).code(400)
   }
   try {
+    const user = await getAuthenticatedUser(request.headers['authorization'])
+    if (!user) {
+      return reply({ error: authenticationError() }).code(401)
+    }
     const trackId = await trackRepository.create(result.trackInfo)
     if (trackId) {
       reply('').code(201)
@@ -42,8 +42,8 @@ export const createTrackInfo = (data: any): TrackInfoResult => {
   if (isTrack(data)) {
     const trackInfo = {
       locations: data.locations.map((l: any) => ({
-        longitude: l.longitude,
-        latitude: l.latitude,
+        lon: l.longitude,
+        lat: l.latitude,
         time: l.time
       }))
     }

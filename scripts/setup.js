@@ -7,7 +7,7 @@ const INDEX_SETTINGS = {
   }
 }
 
-const DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'"
+const DATE_TIME_FORMAT = 'strict_date_optional_time||epoch_millis'
 
 const DUBLIN_CORE = {
   type: 'nested',
