@@ -5,10 +5,12 @@ import userDocument from './fixtures/userDocument'
 import token from './fixtures/token'
 import createServer from '../src/server'
 import userRepository from '../src/services/storage/repositories/user'
+import trackRepository from '../src/services/storage/repositories/track'
 
 describe('server', () => {
   let userRepository$Create: sinon.SinonStub
   let userRepository$FindByEmail: sinon.SinonStub
+  let trackRepository$Create: sinon.SinonStub
   let server: Server
 
   before(() => {
@@ -646,9 +648,9 @@ describe('server', () => {
         url: '/me',
       }
 
-      it('responds with status code 400', (done) => {
+      it('responds with status code 401', (done) => {
         server.inject(request, (response) => {
-          assert.equal(response.statusCode, 400)
+          assert.equal(response.statusCode, 401)
           done()
         })
       })
@@ -679,6 +681,184 @@ describe('server', () => {
         },
         method: 'GET',
         url: '/me',
+      }
+
+      it('responds with status code 500', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 500)
+          done()
+        })
+      })
+
+      it('returns an error', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isDefined(body.error)
+          done()
+        })
+      })
+    })
+  })
+
+  describe('POST /tracks', () => {
+    let userRepository$find: sinon.SinonStub
+
+    context('valid data', () => {
+      beforeEach(() => {
+        sinon.stub(trackRepository, 'create')
+        trackRepository$Create = trackRepository.create as sinon.SinonStub
+        trackRepository$Create.resolves('__ID__')
+        sinon.stub(userRepository, 'find')
+        userRepository$find = userRepository.find as sinon.SinonStub
+        userRepository$find.resolves(userDocument)
+      })
+
+      afterEach(() => {
+        trackRepository$Create.restore()
+        userRepository$find.restore()
+      })
+
+      const request = {
+        headers: {
+          'Authorization': token,
+        },
+        method: 'POST',
+        payload: {
+          locations: [
+            {
+              latitude: 47.11,
+              longitude: 23.555,
+              time: '2016-11-13T13:34:56',
+            }
+          ]
+        },
+        url: '/tracks',
+      }
+
+      it('responds with status code 201', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 201)
+          done()
+        })
+      })
+    })
+
+    context('unauthorized', () => {
+      beforeEach(() => {
+        sinon.stub(trackRepository, 'create')
+        trackRepository$Create = trackRepository.create as sinon.SinonStub
+        trackRepository$Create.resolves('__ID__')
+        sinon.stub(userRepository, 'find')
+        userRepository$find = userRepository.find as sinon.SinonStub
+        userRepository$find.resolves(userDocument)
+      })
+
+      afterEach(() => {
+        trackRepository$Create.restore()
+        userRepository$find.restore()
+      })
+
+      const request = {
+        headers: {},
+        method: 'POST',
+        payload: {
+          locations: [
+            {
+              latitude: 47.11,
+              longitude: 23.555,
+              time: '2016-11-13T13:34:56',
+            }
+          ]
+        },
+        url: '/tracks',
+      }
+
+      it('responds with status code 401', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 401)
+          done()
+        })
+      })
+
+      it('returns an error', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isDefined(body.error)
+          done()
+        })
+      })
+    })
+
+    context('invalid track', () => {
+      beforeEach(() => {
+        sinon.stub(trackRepository, 'create')
+        trackRepository$Create = trackRepository.create as sinon.SinonStub
+        trackRepository$Create.resolves('__ID__')
+        sinon.stub(userRepository, 'find')
+        userRepository$find = userRepository.find as sinon.SinonStub
+        userRepository$find.resolves(userDocument)
+      })
+
+      afterEach(() => {
+        trackRepository$Create.restore()
+        userRepository$find.restore()
+      })
+
+      const request = {
+        headers: {
+          'Authorization': token
+        },
+        method: 'POST',
+        payload: {},
+        url: '/tracks',
+      }
+
+      it('responds with status code 400', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 400)
+          done()
+        })
+      })
+
+      it('returns an error', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isDefined(body.error)
+          done()
+        })
+      })
+    })
+
+    context('server error', () => {
+      beforeEach(() => {
+        sinon.stub(trackRepository, 'create')
+        trackRepository$Create = trackRepository.create as sinon.SinonStub
+        trackRepository$Create.rejects(new Error('server error'))()
+        sinon.stub(userRepository, 'find')
+        userRepository$find = userRepository.find as sinon.SinonStub
+        userRepository$find.resolves(userDocument)
+      })
+
+      afterEach(() => {
+        trackRepository$Create.restore()
+        userRepository$find.restore()
+      })
+
+      const request = {
+        headers: {
+          'Authorization': token
+        },
+        method: 'POST',
+        payload: {
+          locations: [
+            {
+              latitude: 47.11,
+              longitude: 23.555,
+              time: '2016-11-13T13:34:56',
+            }
+          ]
+        },
+        url: '/tracks',
       }
 
       it('responds with status code 500', (done) => {

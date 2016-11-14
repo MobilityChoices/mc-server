@@ -8,5 +8,9 @@
     "outDir": "dist",
     "strictNullChecks": true,
     "target": "es2015"
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "playground"
+  ]
 }
