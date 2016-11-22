@@ -1,4 +1,4 @@
-const userDocument = {
+const document = {
   _index: 'users',
   _type: 'default',
   _id: '__ID__',
@@ -10,4 +10,4 @@ const userDocument = {
   }
 }
 
-export default userDocument
+export default document
