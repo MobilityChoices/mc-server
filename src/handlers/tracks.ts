@@ -30,8 +30,45 @@ async function create(request: Request, reply: IReply) {
   }
 }
 
+async function all(request: Request, reply: IReply) {
+  try {
+    const user = await getAuthenticatedUser(request.headers['authorization'])
+    if (!user) {
+      return reply({ error: authenticationError() }).code(401)
+    }
+    const from = Math.max(request.query.$skip, 0) || 0
+    const size = Math.min(Math.max(0, request.query.$top), 25)
+    const tracks = await getAllTracks(from, size, user._id)
+    reply(tracks.hits).code(200)
+  } catch (e) {
+    reply({ error: serverError() }).code(500)
+  }
+}
+
+async function adminAll(request: Request, reply: IReply) {
+  try {
+    const user = await getAuthenticatedUser(request.headers['authorization'])
+    if (!user) {
+      return reply({ error: authenticationError() }).code(401)
+    }
+    if (!user._source.isAdmin) {
+      return reply({ error: {} }).code(403)
+    }
+    const from = Math.max(request.query.$skip, 0) || 0
+    const size = Math.min(Math.max(0, request.query.$top), 25)
+    const tracks = await getAllTracks(from, size, '*')
+    reply(tracks.hits).code(200)
+  } catch (e) {
+    reply({ error: serverError() }).code(500)
+  }
+}
+
 export default {
   create,
+  all,
+  admin: {
+    all: adminAll,
+  }
 }
 
 type TrackInfoResult =
@@ -54,4 +91,13 @@ export const createTrackInfo = (data: any, owner: string): TrackInfoResult => {
   }
   const error = malformedValueError('track', 'track is not valid')
   return { success: false, error }
+}
+
+function getAllTracks(skip: number, top: number, owner = '*') {
+  const query = {
+    from: skip,
+    size: top,
+    query: owner !== '*' ? { term: { owner } } : undefined,
+  }
+  return trackRepository.query(query)
 }
