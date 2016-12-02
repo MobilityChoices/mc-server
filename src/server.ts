@@ -2,6 +2,7 @@ import * as Hapi from 'hapi'
 import auth from './handlers/auth'
 import users from './handlers/users'
 import tracks from './handlers/tracks'
+import directions from './handlers/directions'
 
 const createServer = (port: number, isTest = false) => {
   const server = new Hapi.Server()
@@ -57,6 +58,12 @@ const createServer = (port: number, isTest = false) => {
     method: 'GET',
     path: '/admin/tracks',
     handler: tracks.admin.all,
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/directions',
+    handler: directions.get,
   })
 
   return server
