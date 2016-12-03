@@ -1152,10 +1152,25 @@ describe('server', () => {
         },
       }
 
-      it('works', (done) => {
+      it('responds with status code 200', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 200)
+          done()
+        })
+      })
+
+      it('returns an object', (done) => {
         server.inject(request, (response) => {
           const body = JSON.parse(response.payload)
           assert.isObject(body)
+          done()
+        })
+      })
+
+      it('returns routes', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isArray(body.routes)
           done()
         })
       })

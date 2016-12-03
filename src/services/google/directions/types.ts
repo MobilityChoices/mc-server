@@ -1,3 +1,10 @@
+export const travelModes: TravelMode[] = [
+  'driving',
+  'walking',
+  'bicycling',
+  'transit',
+]
+
 export type TravelMode = 'driving' | 'walking' | 'bicycling' | 'transit'
 export type Location = string
 
