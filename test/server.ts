@@ -1159,7 +1159,7 @@ describe('server', () => {
         })
       })
 
-      it('returns an object', (done) => {
+      it('returns an object ...', (done) => {
         server.inject(request, (response) => {
           const body = JSON.parse(response.payload)
           assert.isObject(body)
@@ -1167,7 +1167,7 @@ describe('server', () => {
         })
       })
 
-      it('returns routes', (done) => {
+      it('... that contains an array of routes', (done) => {
         server.inject(request, (response) => {
           const body = JSON.parse(response.payload)
           assert.isArray(body.routes)
