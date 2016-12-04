@@ -14,7 +14,7 @@ async function get(request: Request, reply: IReply) {
       routeArrays.forEach(routeArray => {
         routes.push(routeArray.length ? routeArray[0] : undefined)
       })
-      return routes
+      return routes.filter(r => !!r)
     }))
     reply({ routes }).code(200)
   } else {
