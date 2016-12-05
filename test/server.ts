@@ -4,6 +4,7 @@ import * as sinon from 'sinon'
 import userDocument from './fixtures/userDocument'
 import adminDocument from './fixtures/adminDocument'
 import allTrackDocuments from './fixtures/allTrackDocuments'
+import trackDocument from './fixtures/trackDocument'
 import token from './fixtures/token'
 import googleRoute from './fixtures/googleRoute'
 import createServer from '../src/server'
@@ -941,6 +942,47 @@ describe('server', () => {
       const request = {
         method: 'GET',
         url: '/tracks',
+        headers: {},
+      }
+
+      it('responds with status code 401', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 401)
+          done()
+        })
+      })
+
+      it('returns an error', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isObject(body.error)
+          done()
+        })
+      })
+    })
+  })
+
+  describe('GET /tracks/:id', () => {
+    let trackRepository$Get: sinon.SinonStub
+
+    context('is not authenticated', () => {
+      beforeEach(() => {
+        sinon.stub(trackRepository, 'get')
+        trackRepository$Get = trackRepository.get as sinon.SinonStub
+        trackRepository$Get.resolves(trackDocument)
+        sinon.stub(userRepository, 'find')
+        userRepository$Find = userRepository.find as sinon.SinonStub
+        userRepository$Find.resolves(userDocument)
+      })
+
+      afterEach(() => {
+        trackRepository$Get.restore()
+        userRepository$Find.restore()
+      })
+
+      const request = {
+        method: 'GET',
+        url: '/tracks/__TID__',
         headers: {},
       }
 
