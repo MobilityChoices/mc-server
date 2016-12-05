@@ -28,8 +28,16 @@ describe('Google Geocode Service', () => {
 
   it('resolves to an array', (done) => {
     getAddress(requestConfig).then((addresses) => {
-      console.log(addresses)
       assert.isArray(addresses)
+      done()
+    })
+  })
+
+  it('... of address objects', (done) => {
+    getAddress(requestConfig).then((addresses) => {
+      addresses.forEach((address) => {
+        assert.isString(address.formatted_address)
+      })
       done()
     })
   })
