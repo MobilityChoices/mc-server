@@ -5,9 +5,11 @@ import userDocument from './fixtures/userDocument'
 import adminDocument from './fixtures/adminDocument'
 import allTrackDocuments from './fixtures/allTrackDocuments'
 import token from './fixtures/token'
+import googleRoute from './fixtures/googleRoute'
 import createServer from '../src/server'
 import userRepository from '../src/services/storage/repositories/user'
 import trackRepository from '../src/services/storage/repositories/track'
+import * as GoogleDirections from '../src/services/google/directions'
 
 describe('server', () => {
   let userRepository$Create: sinon.SinonStub
@@ -1072,6 +1074,103 @@ describe('server', () => {
         server.inject(request, (response) => {
           const body = JSON.parse(response.payload)
           assert.isObject(body.error)
+          done()
+        })
+      })
+    })
+  })
+
+  describe('GET /directions', () => {
+    let gDirections: sinon.SinonStub
+
+    beforeEach(() => {
+      sinon.stub(GoogleDirections, 'getDirections')
+      gDirections = GoogleDirections.getDirections as sinon.SinonStub
+      gDirections.resolves(googleRoute)
+    })
+
+    afterEach(() => {
+      gDirections.restore()
+    })
+
+    context('missing origin', () => {
+      const request: IServerInjectOptions = {
+        method: 'GET',
+        url: '/directions?destination=47.5008,9.7423',
+        headers: {
+          'Authorization': token,
+        },
+      }
+
+      it('returns an error', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isObject(body.error)
+          done()
+        })
+      })
+
+      it('responds with status code 400', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 400)
+          done()
+        })
+      })
+    })
+
+    context('missing destination', () => {
+      const request: IServerInjectOptions = {
+        method: 'GET',
+        url: '/directions?origin=47.4124,9.7438',
+        headers: {
+          'Authorization': token,
+        },
+      }
+
+      it('returns an error', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isObject(body.error)
+          done()
+        })
+      })
+
+      it('responds with status code 400', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 400)
+          done()
+        })
+      })
+    })
+
+    context('origin, destination specified', () => {
+      const request: IServerInjectOptions = {
+        method: 'GET',
+        url: '/directions?origin=47.4124,9.7438&destination=47.5008,9.7423',
+        headers: {
+          'Authorization': token,
+        },
+      }
+
+      it('responds with status code 200', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 200)
+          done()
+        })
+      })
+
+      it('returns an object ...', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isObject(body)
+          done()
+        })
+      })
+
+      it('... that contains an array of routes', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isArray(body.routes)
           done()
         })
       })
