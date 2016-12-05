@@ -17,3 +17,9 @@
   data from the data store!
 
 - `npm run start`: starts the server
+
+## Developer Notes
+
+### Required Environment Variables
+
+- `GAPI_KEY`: Google API key.
