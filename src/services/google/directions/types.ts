@@ -6,7 +6,10 @@ export const travelModes: TravelMode[] = [
 ]
 
 export type TravelMode = 'driving' | 'walking' | 'bicycling' | 'transit'
-export type Location = string
+
+type GeoPoint = { lat: number, lng: number }
+type Distance = { text: string, value: number }
+type Duration = { text: string, value: number }
 
 export interface RequestConfig {
   travelMode: TravelMode
@@ -15,20 +18,21 @@ export interface RequestConfig {
 }
 
 export interface Step {
-  distance: {},
-  duration: {},
-  end_location: { lat: number, lng: number },
-  start_location: { lat: number, lng: number },
+  distance: Distance,
+  duration: Duration,
+  end_location: GeoPoint,
+  start_location: GeoPoint,
   travel_mode: string
+  steps: Step[] | undefined
 }
 
 export interface Leg {
-  distance: {},
-  duration: {},
+  distance: Distance,
+  duration: Duration,
   end_address: string,
-  end_location: { lat: number, lng: number },
+  end_location: GeoPoint,
   start_address: string,
-  start_location: { lat: number, lng: number },
+  start_location: GeoPoint,
   steps: Step[]
 }
 
