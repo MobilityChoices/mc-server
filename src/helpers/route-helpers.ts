@@ -8,8 +8,9 @@ export function googleToGeneric(route: GoogleRoute | undefined) {
   let currentTravelMode: TravelMode | undefined = undefined
   route.legs.forEach(leg => {
     leg.steps.forEach(step => {
-      if (step.travel_mode !== currentTravelMode) {
-        currentTravelMode = step.travel_mode.toLowerCase() as TravelMode
+      const stepTravelMode = step.travel_mode.toLowerCase() as TravelMode
+      if (stepTravelMode !== currentTravelMode) {
+        currentTravelMode = stepTravelMode
         travelMode.push(currentTravelMode)
       }
     })
