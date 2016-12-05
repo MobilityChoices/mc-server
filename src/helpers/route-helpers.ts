@@ -1,5 +1,10 @@
 import { Route as GoogleRoute, TravelMode, Leg, Step } from '../services/google/directions/types'
 
+type GenericRoute = {
+  legs: GenericStep[],
+  travelMode: TravelMode[],
+}
+
 type GenericStep = {
   distance: number,
   duration: number,
@@ -32,7 +37,7 @@ function stepMapper(step: Step | Leg): GenericStep {
   }
 }
 
-export function googleToGeneric(route: GoogleRoute | undefined) {
+export function googleToGeneric(route: GoogleRoute | undefined): GenericRoute | undefined {
   if (!route) {
     return undefined
   }
