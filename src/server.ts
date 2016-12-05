@@ -56,6 +56,12 @@ const createServer = (port: number, isTest = false) => {
 
   server.route({
     method: 'GET',
+    path: '/tracks/:id',
+    handler: tracks.get,
+  })
+
+  server.route({
+    method: 'GET',
     path: '/admin/tracks',
     handler: tracks.admin.all,
   })
