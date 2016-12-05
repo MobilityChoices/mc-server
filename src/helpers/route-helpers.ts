@@ -24,7 +24,7 @@ function stepMapper(step: Step | Leg): GenericStep {
       location: step.start_location,
     },
     end: {
-      address: (step as Leg).start_address || undefined,
+      address: (step as Leg).end_address || undefined,
       location: step.end_location,
     },
     steps: (step.steps || []).map(stepMapper),
