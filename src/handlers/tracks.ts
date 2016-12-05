@@ -45,6 +45,25 @@ async function all(request: Request, reply: IReply) {
   }
 }
 
+async function get(request: Request, reply: IReply) {
+  try {
+    const user = await getAuthenticatedUser(request.headers['authorization'])
+    if (!user) {
+      return reply({ error: authenticationError() }).code(401)
+    }
+    const track = await trackRepository.get(request.params['id'])
+    if (!track) {
+      return reply({ error: {} }).code(404)
+    }
+    if (track._source.owner !== user._id) {
+      return reply({ error: authenticationError() }).code(401)
+    }
+    reply(track._source).code(200)
+  } catch (e) {
+    reply({ error: serverError() }).code(500)
+  }
+}
+
 async function adminAll(request: Request, reply: IReply) {
   try {
     const user = await getAuthenticatedUser(request.headers['authorization'])
@@ -65,6 +84,7 @@ async function adminAll(request: Request, reply: IReply) {
 
 export default {
   create,
+  get,
   all,
   admin: {
     all: adminAll,
