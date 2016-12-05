@@ -1,12 +1,13 @@
 import * as axios from 'axios'
 import * as qs from 'qs'
 import elasticUrl from './elasticUrl'
+import { log } from '../../shared'
 
 const ElasticClient = {
   request: (requestPath = '', data = {}, method = 'GET') => {
     let payload = {}
 
-    console.log(`[Elastic] ${method}  ${requestPath}`)
+    log(`[Elastic] ${method}  ${requestPath}`)
 
     switch (method) {
       case 'GET':

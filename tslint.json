@@ -4,6 +4,7 @@
         "class-name": true,
         "comment-format": [ true, "check-space" ],
         "indent": [ true, "spaces" ],
+        "no-console": [ true, "log", "warn", "error" ],
         "no-duplicate-variable": true,
         "no-eval": true,
         "no-internal-module": true,
