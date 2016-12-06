@@ -994,6 +994,15 @@ describe('server', () => {
           done()
         })
       })
+
+      it('returns the track', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isObject(body)
+          assert.isArray(body.locations)
+          done()
+        })
+      })
     })
 
     context('is not authenticated', () => {
