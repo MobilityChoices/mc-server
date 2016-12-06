@@ -965,6 +965,37 @@ describe('server', () => {
   describe('GET /tracks/:id', () => {
     let trackRepository$Get: sinon.SinonStub
 
+    context('is authenticated', () => {
+      beforeEach(() => {
+        sinon.stub(trackRepository, 'get')
+        trackRepository$Get = trackRepository.get as sinon.SinonStub
+        trackRepository$Get.resolves(trackDocument)
+        sinon.stub(userRepository, 'find')
+        userRepository$Find = userRepository.find as sinon.SinonStub
+        userRepository$Find.resolves(userDocument)
+      })
+
+      afterEach(() => {
+        trackRepository$Get.restore()
+        userRepository$Find.restore()
+      })
+
+      const request = {
+        method: 'GET',
+        url: '/tracks/__TID__',
+        headers: {
+          'Authorization': token,
+        },
+      }
+
+      it('responds with status code 200', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 200)
+          done()
+        })
+      })
+    })
+
     context('is not authenticated', () => {
       beforeEach(() => {
         sinon.stub(trackRepository, 'get')
