@@ -918,7 +918,7 @@ describe('server', () => {
       it('returns a list of tracks', (done) => {
         server.inject(request, (response) => {
           const body = JSON.parse(response.payload)
-          assert.isArray(body.hits)
+          assert.isArray(body.data)
           done()
         })
       })

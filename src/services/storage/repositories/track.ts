@@ -24,7 +24,7 @@ const trackRepository = {
   },
 
   query: (query: Object) => {
-    return repository.query('tracks', 'default', query)
+    return repository.query<Track>('tracks', 'default', query)
   }
 }
 
