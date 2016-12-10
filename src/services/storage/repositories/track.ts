@@ -15,12 +15,16 @@ const trackRepository = {
     return repository.query<Track>('tracks', 'default', searchConfig)
   },
 
+  get: (id: string) => {
+    return repository.find<Track>('tracks', 'default', id)
+  },
+
   create: (track: any) => {
     return repository.create('tracks', 'default', track)
   },
 
   query: (query: Object) => {
-    return repository.query('tracks', 'default', query)
+    return repository.query<Track>('tracks', 'default', query)
   }
 }
 

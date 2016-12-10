@@ -45,13 +45,19 @@ const createServer = (port: number, isTest = false) => {
   server.route({
     method: 'POST',
     path: '/tracks',
-    handler: tracks.create
+    handler: tracks.create,
   })
 
   server.route({
     method: 'GET',
     path: '/tracks',
-    handler: tracks.all
+    handler: tracks.all,
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/tracks/{id}',
+    handler: tracks.get,
   })
 
   server.route({

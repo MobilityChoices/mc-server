@@ -36,10 +36,36 @@ async function all(request: Request, reply: IReply) {
     if (!user) {
       return reply({ error: authenticationError() }).code(401)
     }
-    const from = Math.max(request.query.$skip, 0) || 0
-    const size = Math.min(Math.max(0, request.query.$top), 25)
-    const tracks = await getAllTracks(from, size, user._id)
-    reply(tracks.hits).code(200)
+    const tracks = await getAllTracks(0, 100, user._id)
+    const minimalTracks = tracks.hits.hits.map((track) => {
+      const locations = track._source.locations || []
+      const firstLoc = locations.length ? locations[0] : {}
+      const lastLoc = locations.length ? locations[locations.length - 1] : {}
+      return {
+        start: firstLoc,
+        end: lastLoc,
+      }
+    })
+    reply({ data: minimalTracks }).code(200)
+  } catch (e) {
+    reply({ error: serverError() }).code(500)
+  }
+}
+
+async function get(request: Request, reply: IReply) {
+  try {
+    const user = await getAuthenticatedUser(request.headers['authorization'])
+    if (!user) {
+      return reply({ error: authenticationError() }).code(401)
+    }
+    const track = await trackRepository.get(request.params['id'])
+    if (!track) {
+      return reply({ error: {} }).code(404)
+    }
+    if (track._source.owner !== user._id) {
+      return reply({ error: authenticationError() }).code(401)
+    }
+    reply(track._source).code(200)
   } catch (e) {
     reply({ error: serverError() }).code(500)
   }
@@ -65,6 +91,7 @@ async function adminAll(request: Request, reply: IReply) {
 
 export default {
   create,
+  get,
   all,
   admin: {
     all: adminAll,
