@@ -56,10 +56,6 @@ export interface Location {
   time: string
 }
 
-export interface AddressedLocation extends Location {
-  address: string
-}
-
 export const isLocation = (maybeLocation: any): maybeLocation is Location => {
   const location = (maybeLocation || { location: {} }) as Location
   return (
