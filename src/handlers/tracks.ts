@@ -67,7 +67,7 @@ async function all(request: Request, reply: IReply) {
     const tracks = await getAllTracks(0, 20, user._id)
     const minimalTracks = tracks.hits.hits.map((track) => {
       const source = track._source
-      const created = source.dc && source.dc.created ? source.dc.created : undefined
+      const created = source.created || undefined
       const locations = source.locations || []
       const start = locations.length && locations[0] || undefined
       const end = locations.length && locations[locations.length - 1] || undefined
