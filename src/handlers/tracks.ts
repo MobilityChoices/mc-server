@@ -57,7 +57,11 @@ async function all(request: Request, reply: IReply) {
       const start = locations.length && locations[0] || undefined
       const end = locations.length && locations[locations.length - 1] || undefined
       const duration = getTimeDiff(start, end)
-      return { id: track._id, created, start, end, duration }
+      const strings = {
+        duration: moment.duration(duration, 'seconds').humanize(),
+        created: moment(created).fromNow(),
+      }
+      return { id: track._id, created, start, end, duration, strings }
     })
     reply({ data: minimalTracks }).code(200)
   } catch (e) {
