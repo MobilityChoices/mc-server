@@ -35,6 +35,7 @@
     "hapi": "15.2.0",
     "joi": "9.2.0",
     "jsonwebtoken": "7.1.9",
+    "moment": "2.17.1",
     "qs": "6.3.0"
   },
   "devDependencies": {
