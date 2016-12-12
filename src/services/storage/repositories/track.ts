@@ -1,3 +1,4 @@
+import * as moment from 'moment'
 import repository from '../repository'
 
 type SearchConfig = {
@@ -6,6 +7,9 @@ type SearchConfig = {
 }
 
 type Track = {
+  dc?: {
+    created?: string,
+  },
   owner: string,
   locations: { location: { lat: number, lon: number }, time: string }[],
 }
@@ -20,7 +24,12 @@ const trackRepository = {
   },
 
   create: (track: any) => {
-    return repository.create('tracks', 'default', track)
+    return repository.create('tracks', 'default', {
+      ...track,
+      dc: {
+        created: moment().toISOString(),
+      }
+    })
   },
 
   query: (query: Object) => {

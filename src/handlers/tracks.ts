@@ -9,6 +9,7 @@ import { isTrack, Track, Location, AddressedLocation } from '../helpers/types'
 import trackRepository from '../services/storage/repositories/track'
 import { getAuthenticatedUser } from '../helpers/auth'
 import { getAddress } from '../services/google/geocode'
+import * as moment from 'moment'
 
 async function create(request: Request, reply: IReply) {
   try {
@@ -32,7 +33,7 @@ async function create(request: Request, reply: IReply) {
 }
 
 async function makeAddressedLocation(location?: Location): Promise<AddressedLocation> {
-  return new Promise<any>(async function(resolve, reject) {
+  return new Promise<any>(async function (resolve, reject) {
     if (!location) {
       return resolve({})
     }
@@ -46,25 +47,39 @@ async function makeAddressedLocation(location?: Location): Promise<AddressedLoca
   })
 }
 
+function getTimeDiff(start?: Location, end?: Location): number {
+  if (start && end) {
+    const startMoment = moment(start.time)
+    const endMoment = moment(end.time)
+    if (startMoment.isValid() && endMoment.isValid()) {
+      return endMoment.diff(startMoment, 'seconds')
+    }
+  }
+  return -1
+}
+
 async function all(request: Request, reply: IReply) {
   try {
     const user = await getAuthenticatedUser(request.headers['authorization'])
     if (!user) {
       return reply({ error: authenticationError() }).code(401)
     }
-    const tracks = await getAllTracks(0, 100, user._id)
+    const tracks = await getAllTracks(0, 20, user._id)
     const minimalTracks = tracks.hits.hits.map((track) => {
-      const locations = track._source.locations || []
+      const source = track._source
+      const created = source.dc && source.dc.created ? source.dc.created : undefined
+      const locations = source.locations || []
       const start = locations.length && locations[0] || undefined
       const end = locations.length && locations[locations.length - 1] || undefined
-      return { id: track._id, start, end }
+      const duration = getTimeDiff(start, end)
+      return { id: track._id, created, start, end, duration }
     })
     const response = []
-    for (let i = 0; i < minimalTracks.length; i += 1) {
+    for (let i = 0; i < minimalTracks.length; i += 1) {
       const track = minimalTracks[i]
       const start = await makeAddressedLocation(track.start)
       const end = await makeAddressedLocation(track.end)
-      response.push({ id: track.id, start, end })
+      response.push({ ...track, start, end })
     }
     reply({ data: response }).code(200)
   } catch (e) {
@@ -144,6 +159,7 @@ function getAllTracks(skip: number, top: number, owner = '*') {
   const query = {
     from: skip,
     size: top,
+    sort: { 'dc.created': { 'order': 'asc' } },
     query: owner !== '*' ? { term: { owner } } : undefined,
   }
   return trackRepository.query(query)
