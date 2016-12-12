@@ -7,10 +7,12 @@ import allTrackDocuments from './fixtures/allTrackDocuments'
 import trackDocument from './fixtures/trackDocument'
 import token from './fixtures/token'
 import googleRoute from './fixtures/googleRoute'
+import googleGeocode from './fixtures/googleGeocode'
 import createServer from '../src/server'
 import userRepository from '../src/services/storage/repositories/user'
 import trackRepository from '../src/services/storage/repositories/track'
 import * as GoogleDirections from '../src/services/google/directions'
+import * as GoogleGeocode from '../src/services/google/geocode'
 
 describe('server', () => {
   let userRepository$Create: sinon.SinonStub
@@ -884,6 +886,7 @@ describe('server', () => {
 
   describe('GET /tracks', () => {
     let trackRepository$Query: sinon.SinonStub
+    let googleGetAddress: sinon.SinonStub
 
     context('is authenticated', () => {
       beforeEach(() => {
@@ -893,11 +896,15 @@ describe('server', () => {
         sinon.stub(trackRepository, 'query')
         trackRepository$Query = trackRepository.query as sinon.SinonStub
         trackRepository$Query.resolves(allTrackDocuments)
+        sinon.stub(GoogleGeocode, 'getAddress')
+        googleGetAddress = GoogleGeocode.getAddress as sinon.SinonStub
+        googleGetAddress.resolves(googleGeocode.results)
       })
 
       afterEach(() => {
         userRepository$Find.restore()
         trackRepository$Query.restore()
+        googleGetAddress.restore()
       })
 
       const request = {
