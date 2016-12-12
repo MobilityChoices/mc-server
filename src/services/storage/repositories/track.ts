@@ -7,9 +7,7 @@ type SearchConfig = {
 }
 
 type Track = {
-  dc?: {
-    created?: string,
-  },
+  created: string,
   owner: string,
   locations: { location: { lat: number, lon: number }, time: string }[],
 }
@@ -26,9 +24,7 @@ const trackRepository = {
   create: (track: any) => {
     return repository.create('tracks', 'default', {
       ...track,
-      dc: {
-        created: moment().toISOString(),
-      }
+      created: moment().toISOString(),
     })
   },
 

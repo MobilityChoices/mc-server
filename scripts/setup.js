@@ -9,21 +9,6 @@ const INDEX_SETTINGS = {
 
 const DATE_TIME_FORMAT = 'strict_date_optional_time||epoch_millis'
 
-const DUBLIN_CORE = {
-  type: 'nested',
-  dynamic: 'strict',
-  properties: {
-    created: {
-      type: 'date',
-      format: DATE_TIME_FORMAT
-    },
-    modified: {
-      type: 'date',
-      format: DATE_TIME_FORMAT
-    },
-  }
-}
-
 const deleteIndex = (indexName) => ElasticClient.request(
   `/${indexName}/`,
   {},
@@ -50,7 +35,10 @@ const tracksIndex = {
   mappings: {
     default: {
       properties: {
-        dc: DUBLIN_CORE,
+        created: {
+          type: 'date',
+          format: DATE_TIME_FORMAT
+        },
         owner: {
           type: 'string',
           index: 'not_analyzed'
@@ -83,7 +71,6 @@ const usersIndex = {
     default: {
       _all: { enabled: false },
       properties: {
-        dc: DUBLIN_CORE,
         email: { type: 'string', index: 'not_analyzed' },
         password: { type: 'string', index: 'not_analyzed' },
       }
