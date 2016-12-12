@@ -31,6 +31,7 @@ async function create(request: Request, reply: IReply) {
   }
 }
 
+
 function getTimeDiff(start?: Location, end?: Location): number {
   if (start && end) {
     const startMoment = moment(start.time)
