@@ -43,6 +43,12 @@ const createServer = (port: number, isTest = false) => {
   })
 
   server.route({
+    method: 'PUT',
+    path: '/me',
+    handler: users.updateProfile,
+  })
+
+  server.route({
     method: 'POST',
     path: '/tracks',
     handler: tracks.create,
