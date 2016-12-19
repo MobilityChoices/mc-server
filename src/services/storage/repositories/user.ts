@@ -25,7 +25,7 @@ const userRepository = {
     })
   },
 
-  update: (id: string, user: User) => {
+  update: (id: string, user: Partial<User>) => {
     return new Promise<any>((resolve, reject) => {
       repository.update<User>('users', 'default', id, user).then(response => {
         resolve(response)

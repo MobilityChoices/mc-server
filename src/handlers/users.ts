@@ -21,7 +21,11 @@ async function updateProfile(request: Request, reply: IReply) {
   try {
     const user = await getAuthenticatedUser(request.headers['authorization'])
     if (user) {
-      await UserRepository.update(user._id, request.payload)
+      const partialUser = (request.payload || {}) as Partial<typeof user._source>
+      if (!user._source.isAdmin) {
+        partialUser.isAdmin = false
+      }
+      await UserRepository.update(user._id, partialUser)
       return reply({ status: 'ok' }).code(200)
     } else {
       return reply({ error: authenticationError() }).code(401)

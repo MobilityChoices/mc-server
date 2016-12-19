@@ -91,7 +91,7 @@ const repository = {
     })
   },
 
-  update: <T>(index: string, type: string, id: string, value: T) => {
+  update: <T>(index: string, type: string, id: string, value: Partial<T>) => {
     return new Promise<UpdateResponse>((resolve, reject) => {
       ElasticClient.request(`/${index}/${type}/${id}/_update`, { doc: value }, 'POST')
         .then((response: UpdateResponse) => {
