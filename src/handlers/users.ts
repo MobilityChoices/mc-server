@@ -4,7 +4,7 @@ import { sanitizeUser } from '../helpers/types'
 import { serverError, authenticationError } from '../helpers/errors'
 import UserRepository from '../services/storage/repositories/user'
 
-async function me(request: Request, reply: IReply) {
+async function getProfile(request: Request, reply: IReply) {
   try {
     const user = await getAuthenticatedUser(request.headers['authorization'])
     if (user) {
@@ -36,6 +36,6 @@ async function updateProfile(request: Request, reply: IReply) {
 }
 
 export default {
-  me,
+  getProfile,
   updateProfile,
 }
