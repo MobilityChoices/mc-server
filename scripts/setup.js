@@ -61,8 +61,6 @@ const tracksIndex = {
 
 deleteAndCreateIndex('tracks', tracksIndex)
 
-
-
 //-- USERS ---------------------------------------------------------------------
 
 const usersIndex = {
@@ -73,7 +71,18 @@ const usersIndex = {
       properties: {
         email: { type: 'string', index: 'not_analyzed' },
         password: { type: 'string', index: 'not_analyzed' },
-      }
+        isAdmin: { type: 'boolean' },
+        settings: {
+          dynamic: 'strict',
+          properties: {
+            maxBike: { type: 'integer' },
+            maxWalk: { type: 'integer' },
+            boostEnvironment: { type: 'integer' },
+            boostSport: { type: 'integer' },
+            boostSpeed: { type: 'integer' },
+          },
+        },
+      },
     }
   }
 }
