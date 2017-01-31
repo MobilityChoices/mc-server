@@ -58,3 +58,9 @@ Code für Services die über Requests angesprochen werden: momentan sind dies
 - [ ] Elasticsearch aus dem Repository entfernen.
 - [ ] `src/helpers` aufräumen
 - [ ] JSON Web Tokens `exp` setzen
+
+
+
+## WICHTIG
+
+Requests aus der App sollten immer den `Content-Type` Header gesetzt haben (`Content-Type: application/json`)!
