@@ -15,6 +15,14 @@ interface CreateResponse {
   created: boolean
 }
 
+interface UpdateResponse {
+  _index: string
+  _type: string
+  _id: string
+  _version: number
+  _shards: ShardsInfo
+}
+
 export interface Document<T> {
   _index: string
   _type: string
@@ -81,7 +89,22 @@ const repository = {
           reject(err)
         })
     })
-  }
+  },
+
+  update: <T>(index: string, type: string, id: string, value: Partial<T>) => {
+    return new Promise<UpdateResponse>((resolve, reject) => {
+      ElasticClient.request(`/${index}/${type}/${id}/_update`, { doc: value }, 'POST')
+        .then((response: UpdateResponse) => {
+          if (response) {
+            resolve(response)
+          } else {
+            reject(response)
+          }
+        }).catch((err: any) => {
+          reject(err)
+        })
+    })
+  },
 }
 
 export default repository

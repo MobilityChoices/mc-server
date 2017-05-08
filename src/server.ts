@@ -39,7 +39,13 @@ const createServer = (port: number, isTest = false) => {
   server.route({
     method: 'GET',
     path: '/me',
-    handler: users.me,
+    handler: users.getProfile,
+  })
+
+  server.route({
+    method: 'PUT',
+    path: '/me',
+    handler: users.updateProfile,
   })
 
   server.route({

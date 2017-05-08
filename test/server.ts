@@ -708,6 +708,165 @@ describe('server', () => {
     })
   })
 
+  describe('PUT /me', () => {
+    let user$find: sinon.SinonStub
+    let user$update: sinon.SinonStub
+
+    context('valid data', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'find')
+        user$find = userRepository.find as sinon.SinonStub
+        user$find.resolves(userDocument)
+        sinon.stub(userRepository, 'update')
+        user$update = userRepository.update as sinon.SinonStub
+        user$update.resolves(undefined)
+      })
+
+      afterEach(() => {
+        user$find.restore()
+        user$update.restore()
+      })
+
+      const request = {
+        headers: {
+          'Authorization': token,
+        },
+        method: 'PUT',
+        url: '/me',
+      }
+
+      it('responds with status code 200', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 200)
+          done()
+        })
+      })
+
+      it('returns object with status ok', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.equal(body.status, 'ok')
+          done()
+        })
+      })
+    })
+
+    context('missing authorization token', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'find')
+        user$find = userRepository.find as sinon.SinonStub
+        user$find.resolves(userDocument)
+        sinon.stub(userRepository, 'update')
+        user$update = userRepository.update as sinon.SinonStub
+        user$update.resolves(undefined)
+      })
+
+      afterEach(() => {
+        user$find.restore()
+        user$update.restore()
+      })
+
+      const request = {
+        headers: {},
+        method: 'PUT',
+        url: '/me',
+      }
+
+      it('responds with status code 401', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 401)
+          done()
+        })
+      })
+
+      it('returns an error', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isDefined(body.error)
+          done()
+        })
+      })
+    })
+
+    context('user not found', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'find')
+        user$find = userRepository.find as sinon.SinonStub
+        user$find.resolves(undefined)
+        sinon.stub(userRepository, 'update')
+        user$update = userRepository.update as sinon.SinonStub
+        user$update.resolves(undefined)
+      })
+
+      afterEach(() => {
+        user$find.restore()
+        user$update.restore()
+      })
+
+      const request = {
+        headers: {
+          'Authorization': token,
+        },
+        method: 'PUT',
+        url: '/me',
+      }
+
+      it('responds with status code 401', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 401)
+          done()
+        })
+      })
+
+      it('returns an error', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isDefined(body.error)
+          done()
+        })
+      })
+    })
+
+    context('server error', () => {
+      beforeEach(() => {
+        sinon.stub(userRepository, 'find')
+        user$find = userRepository.find as sinon.SinonStub
+        user$find.rejects(new Error('server error'))
+        sinon.stub(userRepository, 'update')
+        user$update = userRepository.update as sinon.SinonStub
+        user$update.resolves(undefined)
+      })
+
+      afterEach(() => {
+        user$find.restore()
+        user$update.restore()
+      })
+
+      const request = {
+        headers: {
+          'Authorization': token,
+        },
+        method: 'PUT',
+        url: '/me',
+      }
+
+      it('responds with status code 500', (done) => {
+        server.inject(request, (response) => {
+          assert.equal(response.statusCode, 500)
+          done()
+        })
+      })
+
+      it('returns an error', (done) => {
+        server.inject(request, (response) => {
+          const body = JSON.parse(response.payload)
+          assert.isDefined(body.error)
+          done()
+        })
+      })
+    })
+  })
+
   describe('POST /tracks', () => {
     context('valid data', () => {
       beforeEach(() => {
